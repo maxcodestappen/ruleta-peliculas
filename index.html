@@ -51,7 +51,7 @@
         .result-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
         .grayed-out { opacity: 0.4; filter: grayscale(100%); pointer-events: none; transform: scale(0.98); }
         
-        /* SKELETON LOADERS (Animación de carga) */
+        /* SKELETON LOADERS */
         .skeleton { animation: shimmer 1.5s infinite linear; background: linear-gradient(to right, #252525 4%, #333 25%, #252525 36%); background-size: 1000px 100%; }
         @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
         
@@ -63,7 +63,6 @@
         .badge { background: #252525; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
         .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
         
-        /* Créditos de la película */
         .movie-credits { font-size: 0.8rem; color: #888; margin-bottom: 10px; line-height: 1.4; border-top: 1px solid #333; padding-top: 10px; }
         .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 60px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
         
@@ -163,7 +162,7 @@
                 <button class="close-btn" id="closeModalBtn">✕</button>
             </div>
             <div class="modal-tabs">
-                <button class="tab-btn active" id="tabWatchlist">📌 Para ver</button>
+                <button class="tab-btn active" id="tabWatchlist">⏳ Para ver</button>
                 <button class="tab-btn" id="tabHistory">👁️ Ya vistas</button>
             </div>
             <div class="modal-body" id="modalBody">
@@ -192,9 +191,8 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
-        let currentModalTab = 'watchlist'; // 'watchlist' o 'watched'
+        let currentModalTab = 'watchlist'; 
 
-        // --- AUTENTICACIÓN ---
         document.getElementById('loginBtn').addEventListener('click', () => signInWithPopup(auth, provider));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
@@ -216,7 +214,6 @@
             }
         });
 
-        // --- CREADOR DE SKELETONS (Carga Moderna) ---
         function renderSkeletons() {
             const grid = document.getElementById('resultsGrid');
             grid.innerHTML = '';
@@ -238,20 +235,19 @@
             }
         }
 
-        // --- BÚSQUEDA DE PELÍCULAS ---
         async function fetchMovies() {
             document.getElementById('searchBtn').disabled = true;
             document.getElementById('rerollBtn').disabled = true;
             document.getElementById('rerollBox').classList.add('hidden');
             
-            // Mostrar Skeletons
             renderSkeletons();
 
             const genres = document.getElementById('themeFilter').value;
             const timeFilter = document.getElementById('timeFilter').value;
             const randomPage = Math.floor(Math.random() * 10) + 1;
 
-            let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/movie?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100`; 
+            // Agregado watch_region=AR para forzar resultados de Argentina
+            let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/movie?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
             if (genres) url += `&with_genres=${genres}`;
             if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
             else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=109`; 
@@ -269,9 +265,7 @@
                     
                     let isFilteredOut = false;
                     if (currentUser) {
-                        // Revisar si ya la vio
                         const docWatched = await getDoc(doc(db, "users", currentUser.uid, "watched", movie.id.toString()));
-                        // Revisar si ya la guardó para después
                         const docWatchlist = await getDoc(doc(db, "users", currentUser.uid, "watchlist", movie.id.toString()));
                         
                         if (docWatched.exists() || docWatchlist.exists()) isFilteredOut = true;
@@ -295,10 +289,9 @@
             }
         }
 
-        // --- RENDERIZAR RESULTADOS (Y traer Actores/Director) ---
         async function renderMovies(movies) {
             const grid = document.getElementById('resultsGrid');
-            grid.innerHTML = ''; // Limpiamos los skeletons
+            grid.innerHTML = ''; 
             
             for (let movie of movies) {
                 let providersHTML = '<span class="no-providers">No disponible en streaming</span>';
@@ -306,7 +299,7 @@
                 let mainCast = "No disponible";
 
                 try {
-                    // Llamamos a los providers y a los detalles (créditos) en simultáneo para que sea rápido
+                    // Ahora ambas consultas están forzadas a AR
                     const [provRes, detailsRes] = await Promise.all([
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers`),
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}?language=es-MX&append_to_response=credits`)
@@ -315,7 +308,6 @@
                     const provData = await provRes.json();
                     const detailsData = await detailsRes.json();
                     
-                    // Extraer Streaming AR
                     if (provData.results && provData.results.AR && provData.results.AR.flatrate) {
                         providersHTML = '';
                         provData.results.AR.flatrate.slice(0, 4).forEach(platform => {
@@ -323,7 +315,6 @@
                         });
                     }
 
-                    // Extraer Director y Cast
                     if (detailsData.credits) {
                         const dirObj = detailsData.credits.crew.find(c => c.job === 'Director');
                         if (dirObj) director = dirObj.name;
@@ -354,7 +345,7 @@
                         
                         <div class="card-actions">
                             <a href="${trailerLink}" target="_blank" class="action-btn">▶ Tráiler</a>
-                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${movie.id}" data-title="${movie.title}">📌</button>
+                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${movie.id}" data-title="${movie.title}">⏳</button>
                             <button class="action-btn watched-btn" title="Marcar como vista" data-id="${movie.id}" data-title="${movie.title}">👁️ Ya la vi</button>
                         </div>
                     </div>
@@ -362,12 +353,10 @@
                 grid.appendChild(cardDiv);
             }
 
-            // Asignar eventos de los botones (Guardar y Vista)
             assignCardEvents();
         }
 
         function assignCardEvents() {
-            // Guardar para después (Watchlist)
             document.querySelectorAll('.save-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if (!currentUser) return;
@@ -377,7 +366,7 @@
                     const button = e.currentTarget;
                     
                     card.style.opacity = '0.8';
-                    button.innerText = "⏳";
+                    button.innerText = "...";
                     button.disabled = true;
 
                     try {
@@ -388,13 +377,13 @@
                     } catch (error) {
                         console.error("Error:", error);
                         card.style.opacity = '';
-                        button.innerText = "📌";
+                        // Restauramos el reloj de arena en caso de error
+                        button.innerText = "⏳";
                         button.disabled = false;
                     }
                 });
             });
 
-            // Marcar como Vista
             document.querySelectorAll('.watched-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if (!currentUser) return;
@@ -422,23 +411,20 @@
             });
         }
 
-        // --- SISTEMA DE MODAL (Perfil) ---
         const modal = document.getElementById('profileModal');
         const modalBody = document.getElementById('modalBody');
 
         document.getElementById('openProfileBtn').addEventListener('click', () => {
             modal.classList.remove('hidden');
-            loadProfileData('watchlist'); // Carga pendientes por defecto
+            loadProfileData('watchlist'); 
         });
 
         document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.add('hidden'));
         
-        // Cerrar modal tocando afuera
         modal.addEventListener('click', (e) => {
             if(e.target === modal) modal.classList.add('hidden');
         });
 
-        // Tabs del modal
         document.getElementById('tabWatchlist').addEventListener('click', (e) => {
             document.getElementById('tabHistory').classList.remove('active');
             e.target.classList.add('active');
@@ -451,7 +437,6 @@
             loadProfileData('watched');
         });
 
-        // Cargar listas desde Firebase
         async function loadProfileData(collectionName) {
             if(!currentUser) return;
             modalBody.innerHTML = '<div class="empty-msg">Cargando datos...</div>';
@@ -466,7 +451,6 @@
                 let html = '';
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    // Link directo al trailer por si quieren verla desde acá
                     const trailerLink = `https://www.youtube.com/results?search_query=trailer+español+latino+${encodeURIComponent(data.title)}`;
                     html += `
                         <div class="list-item" id="list-item-${docSnap.id}">
@@ -484,7 +468,6 @@
             }
         }
 
-        // Eliminar elemento de Firebase (Expuesto globalmente para el onClick de la lista)
         window.removeFromList = async function(collectionName, docId) {
             if(confirm('¿Seguro que querés eliminar esta película de tu lista?')) {
                 const btn = document.querySelector(`#list-item-${docId} .delete-btn`);
@@ -495,7 +478,6 @@
                     await deleteDoc(doc(db, "users", currentUser.uid, collectionName, docId));
                     document.getElementById(`list-item-${docId}`).remove();
                     
-                    // Si quedó vacía la lista
                     if(document.querySelectorAll('.list-item').length === 0) {
                         modalBody.innerHTML = `<div class="empty-msg">Tu lista está vacía.</div>`;
                     }
@@ -508,7 +490,6 @@
             }
         }
 
-        // Iniciar App
         document.getElementById('searchBtn').addEventListener('click', fetchMovies);
         document.getElementById('rerollBtn').addEventListener('click', fetchMovies);
     </script>
