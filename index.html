@@ -139,12 +139,12 @@
             <select id="themeFilter"></select>
             <select id="timeFilter"></select>
             
-            <label class="checkbox-label" title="Oculta contenido clasificado como Familiar o Infantil">
-                <input type="checkbox" id="excludeKids" checked>
-                🚫 Sin contenido infantil
+            <label class="checkbox-label" title="Incluir contenido clasificado como Familiar o Infantil">
+                <input type="checkbox" id="includeKids">
+                Contenido infantil
             </label>
 
-            <button id="searchBtn" class="btn-primary">Buscar 5 Resultados</button>
+            <button id="searchBtn" class="btn-primary">Buscar</button>
         </div>
 
         <div class="results-grid" id="resultsGrid"></div>
@@ -324,19 +324,22 @@
 
             const genres = document.getElementById('themeFilter').value;
             const timeFilter = document.getElementById('timeFilter').value;
-            const excludeKids = document.getElementById('excludeKids').checked;
+            const includeKids = document.getElementById('includeKids').checked;
             const randomPage = Math.floor(Math.random() * 10) + 1;
 
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/${currentMode}?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
             
+            // EXCLUIR ANIME DE RAÍZ EN TODAS LAS BÚSQUEDAS (Keyword: 210024 = anime)
+            url += `&without_keywords=210024`;
+
             if (genres) {
                 if (genres.startsWith('kw-')) url += `&with_keywords=${genres.replace('kw-', '')}`;
                 else url += `&with_genres=${genres}`;
             }
 
-            // LÓGICA EXCLUIR INFANTIL
-            // Evitamos bloquearlo si el usuario explícitamente eligió "Familiar" (10751) o "Infantil" (10762)
-            if (excludeKids && genres !== '10751' && genres !== '10762') {
+            // LÓGICA DE EXCLUSIÓN INFANTIL INVERTIDA
+            // Si "includeKids" es FALSO (desmarcado), excluimos géneros familiares a menos que el usuario busque eso específicamente
+            if (!includeKids && genres !== '10751' && genres !== '10762') {
                 if (currentMode === 'movie') {
                     url += `&without_genres=10751`;
                 } else {
