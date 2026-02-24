@@ -42,7 +42,6 @@
         select, button { padding: 12px 20px; font-size: 15px; border-radius: var(--radius-sm); border: none; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
         select { background-color: var(--bg-inputs); color: var(--text-primary); flex-grow: 1; min-width: 200px; }
         
-        /* ESTILO PARA EL CHECKBOX INFANTIL */
         .checkbox-label { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.95rem; cursor: pointer; background: var(--bg-inputs); padding: 10px 15px; border-radius: var(--radius-sm); border: 1px solid #333; transition: 0.2s; white-space: nowrap; height: 100%; box-sizing: border-box; font-weight: 600;}
         .checkbox-label:hover { border-color: #555; color: white; }
         .checkbox-label input { width: 16px; height: 16px; accent-color: var(--accent-color); cursor: pointer; margin: 0; }
@@ -63,9 +62,12 @@
         .poster-container img { width: 100%; height: 100%; object-fit: cover; }
         .info-container { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
         .movie-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; line-height: 1.2; }
-        .movie-meta { display: flex; gap: 10px; margin-bottom: 10px; }
+        
+        /* METADATOS Y BADGES (AÑO, ESTRELLAS, EDAD) */
+        .movie-meta { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
         .badge { background: #252525; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
         .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
+        .cert-badge { background: transparent; border: 1px solid #666; color: #ddd; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; } /* Estilo específico para la edad */
         
         .movie-credits { font-size: 0.8rem; color: #888; margin-bottom: 10px; line-height: 1.4; border-top: 1px solid #333; padding-top: 10px; }
         .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 130px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
@@ -329,7 +331,6 @@
 
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/${currentMode}?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
             
-            // EXCLUIR ANIME DE RAÍZ EN TODAS LAS BÚSQUEDAS (Keyword: 210024 = anime)
             url += `&without_keywords=210024`;
 
             if (genres) {
@@ -337,14 +338,9 @@
                 else url += `&with_genres=${genres}`;
             }
 
-            // LÓGICA DE EXCLUSIÓN INFANTIL INVERTIDA
-            // Si "includeKids" es FALSO (desmarcado), excluimos géneros familiares a menos que el usuario busque eso específicamente
             if (!includeKids && genres !== '10751' && genres !== '10762') {
-                if (currentMode === 'movie') {
-                    url += `&without_genres=10751`;
-                } else {
-                    url += `&without_genres=10751,10762`;
-                }
+                if (currentMode === 'movie') url += `&without_genres=10751`;
+                else url += `&without_genres=10751,10762`;
             }
 
             if (currentMode === 'movie') {
@@ -414,15 +410,18 @@
                 let providersHTML = '<span class="no-providers">No disponible en streaming</span>';
                 let director = "Desconocido";
                 let mainCast = "No disponible";
+                let ageRating = ""; // Variable para guardar la clasificación de edad
+                let detailsData = {};
 
                 try {
+                    // SE AGREGA release_dates (pelis) y content_ratings (series) A LA LLAMADA DE LA API
                     const [provRes, detailsRes] = await Promise.all([
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/${currentMode}/${item.id}/watch/providers?language=es-AR`),
-                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/${currentMode}/${item.id}?language=es-MX&append_to_response=credits`)
+                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/${currentMode}/${item.id}?language=es-MX&append_to_response=credits,translations,release_dates,content_ratings`)
                     ]);
 
                     const provData = await provRes.json();
-                    const detailsData = await detailsRes.json();
+                    detailsData = await detailsRes.json();
                     
                     if (provData.results && provData.results.AR && provData.results.AR.flatrate) {
                         providersHTML = '';
@@ -442,6 +441,32 @@
                         mainCast = detailsData.credits.cast.slice(0, 3).map(c => c.name).join(', ') || mainCast;
                     }
 
+                    // --- EXTRACCIÓN DE EDAD RECOMENDADA (Prioriza US y AR) ---
+                    if (currentMode === 'movie' && detailsData.release_dates && detailsData.release_dates.results) {
+                        const priorityCountries = ['US', 'AR', 'MX', 'ES'];
+                        for (let country of priorityCountries) {
+                            let release = detailsData.release_dates.results.find(r => r.iso_3166_1 === country);
+                            if (release) {
+                                let cert = release.release_dates.find(d => d.certification && d.certification !== "");
+                                if (cert) { ageRating = cert.certification; break; }
+                            }
+                        }
+                        if (!ageRating) {
+                            let anyRelease = detailsData.release_dates.results.find(r => r.release_dates.some(d => d.certification !== ""));
+                            if (anyRelease) ageRating = anyRelease.release_dates.find(d => d.certification !== "").certification;
+                        }
+                    } else if (currentMode === 'tv' && detailsData.content_ratings && detailsData.content_ratings.results) {
+                        const priorityCountries = ['US', 'AR', 'MX', 'ES'];
+                        for (let country of priorityCountries) {
+                            let ratingObj = detailsData.content_ratings.results.find(r => r.iso_3166_1 === country && r.rating !== "");
+                            if (ratingObj) { ageRating = ratingObj.rating; break; }
+                        }
+                        if (!ageRating) {
+                            let anyRating = detailsData.content_ratings.results.find(r => r.rating !== "");
+                            if (anyRating) ageRating = anyRating.rating;
+                        }
+                    }
+
                 } catch (e) { console.error("Error extra data", e); }
 
                 const title = item.title || item.name;
@@ -449,10 +474,21 @@
                 const year = releaseDate ? releaseDate.split('-')[0] : 'N/A';
                 const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster";
                 
+                let finalDesc = item.overview || detailsData.overview;
+                if (!finalDesc && detailsData.translations && detailsData.translations.translations) {
+                    let fallback = detailsData.translations.translations.find(t => t.iso_639_1 === 'es' && t.data && t.data.overview);
+                    if (!fallback) fallback = detailsData.translations.translations.find(t => t.iso_639_1 === 'en' && t.data && t.data.overview);
+                    if (fallback) finalDesc = fallback.data.overview;
+                }
+                finalDesc = finalDesc || "Sin descripción en la base de datos.";
+
                 const trailerQuery = currentMode === 'movie' ? `trailer español latino pelicula ${title}` : `trailer español latino serie ${title}`;
                 const trailerLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(trailerQuery)}`;
                 const dbId = `${currentMode}_${item.id}`;
                 const dirLabel = currentMode === 'movie' ? 'Dir' : 'Crea';
+                
+                // Renderizado del HTML del badge de edad si existe
+                const certBadgeHTML = ageRating ? `<span class="badge cert-badge" title="Clasificación por edades">${ageRating}</span>` : '';
 
                 const cardDiv = document.createElement('div');
                 cardDiv.className = "result-card";
@@ -465,10 +501,10 @@
                         <div class="movie-meta">
                             <span class="badge">${year}</span>
                             <span class="badge rating-badge">★ ${item.vote_average.toFixed(1)}</span>
-                        </div>
+                            ${certBadgeHTML} </div>
                         <div class="providers-container">${providersHTML}</div>
                         <div class="movie-credits">🎬 <b>${dirLabel}:</b> ${director} <br> 👥 <b>Con:</b> ${mainCast}</div>
-                        <div class="movie-desc">${item.overview || "Sin descripción disponible."}</div>
+                        <div class="movie-desc">${finalDesc}</div>
                         
                         <div class="card-actions">
                             <a href="${trailerLink}" target="_blank" class="action-btn trailer-btn">▶ Tráiler</a>
