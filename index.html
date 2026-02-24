@@ -40,10 +40,6 @@
         .controls { background-color: var(--bg-card); padding: 25px; border-radius: var(--radius-lg); display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; margin-bottom: 40px; width: 100%; max-width: 1000px; border: 1px solid #2a2a2a; }
         select, button { padding: 12px 20px; font-size: 15px; border-radius: var(--radius-sm); border: none; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
         select { background-color: var(--bg-inputs); color: var(--text-primary); flex-grow: 1; min-width: 200px; }
-        
-        .checkbox-label { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.95rem; cursor: pointer; background: var(--bg-inputs); padding: 10px 15px; border-radius: var(--radius-sm); border: 1px solid #333; transition: 0.2s; white-space: nowrap; height: 100%; box-sizing: border-box; font-weight: 600;}
-        .checkbox-label:hover { border-color: #555; color: white; }
-        .checkbox-label input { width: 16px; height: 16px; accent-color: var(--accent-color); cursor: pointer; margin: 0; }
 
         .btn-primary { background: var(--accent-color); color: white; flex-grow: 1; transition: 0.2s; min-width: 200px; }
         .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
@@ -152,12 +148,6 @@
         <div class="controls">
             <select id="themeFilter"></select>
             <select id="timeFilter"></select>
-            
-            <label class="checkbox-label" title="Incluir contenido clasificado como Familiar o Infantil">
-                <input type="checkbox" id="includeKids">
-                Contenido infantil
-            </label>
-
             <button id="searchBtn" class="btn-primary">Buscar</button>
         </div>
 
@@ -206,7 +196,6 @@
         let currentUser = null;
         let currentMode = 'movie'; 
 
-        // Diccionario de traducciones para las edades (Argentina-friendly)
         const ratingExplanations = {
             "G": "Apto para Todo Público (ATP)",
             "TV-G": "Apto para Todo Público (ATP)",
@@ -255,8 +244,7 @@
             <option value="80">🕵️ Crimen/Policial</option>
             <option value="99">🎥 Documental</option>
             <option value="18">🎭 Drama</option>
-            <option value="10751">👨‍👩‍👧‍👦 Familiar</option>
-            <option value="10762">🧸 Infantil</option>
+            <option value="10751,10762">👨‍👩‍👧‍👦 Familiar</option>
             <option value="9648">🔍 Misterio</option>
             <option value="10764">📺 Reality Show</option>
             <option value="10765">👽 Sci-Fi y Fantasía</option>
@@ -355,7 +343,6 @@
 
             const genres = document.getElementById('themeFilter').value;
             const timeFilter = document.getElementById('timeFilter').value;
-            const includeKids = document.getElementById('includeKids').checked;
             const randomPage = Math.floor(Math.random() * 10) + 1;
 
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/${currentMode}?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
@@ -366,7 +353,8 @@
                 else url += `&with_genres=${genres}`;
             }
 
-            if (!includeKids && genres !== '10751' && genres !== '10762') {
+            // Excluye contenido familiar/infantil SIEMPRE, a menos que se seleccione esa categoría
+            if (genres !== '10751' && genres !== '10751,10762') {
                 if (currentMode === 'movie') url += `&without_genres=10751`;
                 else url += `&without_genres=10751,10762`;
             }
@@ -468,7 +456,6 @@
                         mainCast = detailsData.credits.cast.slice(0, 3).map(c => c.name).join(', ') || mainCast;
                     }
 
-                    // --- EXTRACCIÓN DE EDAD RECOMENDADA ---
                     if (currentMode === 'movie' && detailsData.release_dates && detailsData.release_dates.results) {
                         const priorityCountries = ['US', 'AR', 'MX', 'ES'];
                         for (let country of priorityCountries) {
@@ -506,7 +493,6 @@
                 const dbId = `${currentMode}_${item.id}`;
                 const dirLabel = currentMode === 'movie' ? 'Dir' : 'Crea';
                 
-                // --- EXPLICACIÓN AL HOVER ---
                 const ratingTip = ratingExplanations[ageRating] || "Clasificación de edad según el país de origen";
                 const certBadgeHTML = ageRating ? `<span class="badge cert-badge" title="${ratingTip}">${ageRating}</span>` : '';
 
