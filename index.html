@@ -46,8 +46,16 @@
         .btn-primary:disabled { background-color: #444; color: #888; cursor: not-allowed; transform: none; }
 
         .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; max-width: 1280px; }
-        .result-card { background-color: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2a2a2a; transition: 0.3s; position: relative; }
+        .result-card { background-color: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2a2a2a; transition: 0.4s ease; position: relative; }
         .result-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
+        
+        /* NUEVA CLASE PARA TARJETAS YA VISTAS */
+        .grayed-out {
+            opacity: 0.4;
+            filter: grayscale(100%);
+            pointer-events: none; /* Evita que le vuelvas a hacer clic a los botones adentro */
+            transform: scale(0.98); /* La achica apenitas para dar sensación de inactiva */
+        }
         
         .poster-container { width: 100%; height: 330px; background-color: #000; }
         .poster-container img { width: 100%; height: 100%; object-fit: cover; }
@@ -186,7 +194,6 @@
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/movie?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100`; 
             if (genres) url += `&with_genres=${genres}`;
             
-            // LÓGICA DE TIEMPO ACTUALIZADA (110 minutos = 1:50h)
             if (timeFilter === 'corta') {
                 url += `&with_runtime.lte=80`;
             } else if (timeFilter === 'normal') {
@@ -269,7 +276,7 @@
                         <div class="movie-desc">${movie.overview || "Sin descripción."}</div>
                         <div class="card-actions">
                             <a href="${trailerLink}" target="_blank" class="trailer-btn">▶ Tráiler</a>
-                            <button class="watched-btn" title="Marcar como vista y ocultar" data-id="${movie.id}" data-title="${movie.title}">👁️ Ya la vi</button>
+                            <button class="watched-btn" title="Marcar como vista" data-id="${movie.id}" data-title="${movie.title}">👁️ Ya la vi</button>
                         </div>
                     </div>
                 `;
@@ -283,23 +290,32 @@
                     const movieId = e.currentTarget.getAttribute('data-id');
                     const movieTitle = e.currentTarget.getAttribute('data-title');
                     const card = document.getElementById(`movie-card-${movieId}`);
+                    const button = e.currentTarget;
                     
-                    card.style.opacity = '0.5';
-                    card.style.pointerEvents = 'none';
-                    e.currentTarget.innerText = "⏳ Guardando...";
+                    // Mostramos estado de carga
+                    card.style.opacity = '0.8';
+                    button.innerText = "⏳ Guardando...";
+                    button.disabled = true; // Evita doble clic
 
                     try {
                         await setDoc(doc(db, "users", currentUser.uid, "watched", movieId), {
                             title: movieTitle,
                             addedAt: new Date()
                         });
-                        card.remove();
+                        
+                        // Si se guardó bien, aplicamos el efecto "grayed out"
+                        card.style.opacity = ''; // Limpiamos el opacity temporal
+                        card.classList.add('grayed-out');
+                        button.innerText = "✅ Vista";
+                        
                     } catch (error) {
                         console.error("Error guardando:", error);
                         alert("Hubo un error al guardar.");
-                        card.style.opacity = '1';
-                        card.style.pointerEvents = 'auto';
-                        e.currentTarget.innerText = "👁️ Ya la vi";
+                        
+                        // Revertimos cambios si falla
+                        card.style.opacity = '';
+                        button.innerText = "👁️ Ya la vi";
+                        button.disabled = false;
                     }
                 });
             });
