@@ -246,12 +246,16 @@
             const timeFilter = document.getElementById('timeFilter').value;
             const randomPage = Math.floor(Math.random() * 10) + 1;
 
-            // Agregado watch_region=AR para forzar resultados de Argentina
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/movie?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
             if (genres) url += `&with_genres=${genres}`;
-            if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
-            else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=109`; 
-            else if (timeFilter === 'larga') url += `&with_runtime.gte=110`; 
+            
+            if (timeFilter === 'corta') {
+                url += `&with_runtime.lte=80`;
+            } else if (timeFilter === 'normal') {
+                url += `&with_runtime.gte=81&with_runtime.lte=109`; 
+            } else if (timeFilter === 'larga') {
+                url += `&with_runtime.gte=110`; 
+            }
 
             try {
                 const response = await fetch(url);
@@ -299,10 +303,9 @@
                 let mainCast = "No disponible";
 
                 try {
-                    // Ahora ambas consultas están forzadas a AR
+                    // AQUÍ ESTÁ EL ARREGLO PARA QUE EL WORKER ARME BIEN LA URL (?language=es-AR)
                     const [provRes, detailsRes] = await Promise.all([
-                        // REEMPLAZALA POR ESTA (Notá el "?" al final):
-                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers?`),
+                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers?language=es-AR`),
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}?language=es-MX&append_to_response=credits`)
                     ]);
 
@@ -378,7 +381,6 @@
                     } catch (error) {
                         console.error("Error:", error);
                         card.style.opacity = '';
-                        // Restauramos el reloj de arena en caso de error
                         button.innerText = "⏳";
                         button.disabled = false;
                     }
@@ -496,4 +498,3 @@
     </script>
 </body>
 </html>
-
