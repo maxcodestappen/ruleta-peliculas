@@ -301,7 +301,8 @@
                 try {
                     // Ahora ambas consultas están forzadas a AR
                     const [provRes, detailsRes] = await Promise.all([
-                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers`),
+                        // REEMPLAZALA POR ESTA (Notá el "?" al final):
+                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers?`),
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}?language=es-MX&append_to_response=credits`)
                     ]);
 
@@ -495,3 +496,4 @@
     </script>
 </body>
 </html>
+
