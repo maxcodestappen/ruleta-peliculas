@@ -20,8 +20,10 @@
         /* HEADER */
         .header { width: 100%; max-width: 1280px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 10px 20px; box-sizing: border-box; }
         .header h1 { font-weight: 900; letter-spacing: -1px; margin: 0; font-size: 2rem; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .user-info { display: flex; align-items: center; gap: 15px; background: var(--bg-inputs); padding: 8px 15px; border-radius: 30px; border: 1px solid #333; }
-        .user-info img { width: 32px; height: 32px; border-radius: 50%; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .profile-btn { display: flex; align-items: center; gap: 10px; background: var(--bg-inputs); padding: 6px 15px; border-radius: 30px; border: 1px solid #333; cursor: pointer; transition: 0.2s; }
+        .profile-btn:hover { background: #333; border-color: #555; }
+        .profile-btn img { width: 32px; height: 32px; border-radius: 50%; }
         .user-name { font-weight: 600; font-size: 0.95rem; }
         .btn-logout { background: transparent; color: var(--text-secondary); border: 1px solid #444; padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
         .btn-logout:hover { background: #ff3d47; color: #fff; border-color: #ff3d47; }
@@ -37,7 +39,6 @@
 
         /* APP PRINCIPAL */
         .app-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
-
         .controls { background-color: var(--bg-card); padding: 25px; border-radius: var(--radius-lg); display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; width: 100%; max-width: 900px; border: 1px solid #2a2a2a; }
         select, button { padding: 12px 20px; font-size: 15px; border-radius: var(--radius-sm); border: none; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
         select { background-color: var(--bg-inputs); color: var(--text-primary); flex-grow: 1; }
@@ -48,14 +49,11 @@
         .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; max-width: 1280px; }
         .result-card { background-color: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2a2a2a; transition: 0.4s ease; position: relative; }
         .result-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
+        .grayed-out { opacity: 0.4; filter: grayscale(100%); pointer-events: none; transform: scale(0.98); }
         
-        /* NUEVA CLASE PARA TARJETAS YA VISTAS */
-        .grayed-out {
-            opacity: 0.4;
-            filter: grayscale(100%);
-            pointer-events: none; /* Evita que le vuelvas a hacer clic a los botones adentro */
-            transform: scale(0.98); /* La achica apenitas para dar sensación de inactiva */
-        }
+        /* SKELETON LOADERS (Animación de carga) */
+        .skeleton { animation: shimmer 1.5s infinite linear; background: linear-gradient(to right, #252525 4%, #333 25%, #252525 36%); background-size: 1000px 100%; }
+        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
         
         .poster-container { width: 100%; height: 330px; background-color: #000; }
         .poster-container img { width: 100%; height: 100%; object-fit: cover; }
@@ -64,22 +62,43 @@
         .movie-meta { display: flex; gap: 10px; margin-bottom: 10px; }
         .badge { background: #252525; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
         .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
-        .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 80px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
         
-        .providers-container { display: flex; gap: 8px; margin-bottom: 15px; min-height: 35px; align-items: center; }
+        /* Créditos de la película */
+        .movie-credits { font-size: 0.8rem; color: #888; margin-bottom: 10px; line-height: 1.4; border-top: 1px solid #333; padding-top: 10px; }
+        .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 60px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        
+        .providers-container { display: flex; gap: 8px; margin-bottom: 10px; min-height: 35px; align-items: center; }
         .provider-icon { width: 35px; height: 35px; border-radius: 8px; }
         .no-providers { font-size: 0.8rem; color: #777; font-style: italic; }
 
-        .card-actions { display: flex; gap: 8px; }
-        .trailer-btn { background-color: var(--bg-inputs); color: white; text-align: center; padding: 10px; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.85rem; flex-grow: 1; font-weight: bold; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;}
-        .trailer-btn:hover { background-color: #fff; color: #000; }
-        .watched-btn { background-color: transparent; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: var(--radius-sm); cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
-        .watched-btn:hover { background-color: #333; color: white; border-color: white; }
+        .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .action-btn { background-color: var(--bg-inputs); color: white; text-align: center; padding: 10px; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.85rem; flex-grow: 1; font-weight: bold; transition: 0.2s; cursor: pointer; border: 1px solid transparent; }
+        .action-btn:hover { background-color: #fff; color: #000; }
+        .save-btn { background-color: rgba(255, 255, 255, 0.1); border: 1px solid #555; }
+        .save-btn:hover { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .watched-btn { background-color: transparent; border: 1px solid #555; color: #aaa; }
+        .watched-btn:hover { background-color: #333; color: white; }
 
-        .loading { font-size: 1.2rem; color: var(--accent-color); font-weight: 600; display: none; margin: 30px 0; }
         .reroll-container { margin-top: 40px; margin-bottom: 60px; width: 100%; max-width: 400px; }
         .btn-secondary { background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); width: 100%; padding: 15px; }
         .btn-secondary:hover { background: var(--accent-color); color: white; }
+
+        /* MODAL DE PERFIL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 1; transition: 0.3s; }
+        .modal-overlay.hidden { opacity: 0; pointer-events: none; }
+        .modal-content { background: var(--bg-card); width: 90%; max-width: 500px; border-radius: var(--radius-lg); border: 1px solid #333; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
+        .modal-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; }
+        .close-btn { background: transparent; color: #fff; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; }
+        .modal-tabs { display: flex; border-bottom: 1px solid #333; }
+        .tab-btn { flex: 1; background: transparent; color: var(--text-secondary); padding: 15px; font-size: 1rem; border-radius: 0; }
+        .tab-btn.active { color: var(--accent-color); border-bottom: 3px solid var(--accent-color); background: rgba(255,61,71,0.05); }
+        .modal-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-inputs); border-radius: var(--radius-sm); margin-bottom: 10px; }
+        .list-item-title { font-weight: 600; font-size: 0.95rem; }
+        .delete-btn { background: transparent; color: #ff5555; border: 1px solid #ff5555; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+        .delete-btn:hover { background: #ff5555; color: #fff; }
+        .empty-msg { text-align: center; color: #777; margin-top: 30px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -87,15 +106,17 @@
     <div class="header">
         <h1>🎬 CineFlow</h1>
         <div id="loggedInView" class="user-info hidden">
-            <img id="userPic" src="" alt="User">
-            <span class="user-name" id="userName">Usuario</span>
+            <div class="profile-btn" id="openProfileBtn" title="Ver mi historial y guardados">
+                <img id="userPic" src="" alt="User">
+                <span class="user-name" id="userName">Usuario</span>
+            </div>
             <button class="btn-logout" id="logoutBtn">Salir</button>
         </div>
     </div>
 
     <div id="welcomeScreen" class="welcome-screen">
         <h2>Dejá de scrollear. Empezá a ver.</h2>
-        <p>Iniciá sesión para descubrir películas filtradas por tu estado de ánimo, ver en qué plataforma de streaming están y guardar las que ya viste para que nunca más te las volvamos a recomendar.</p>
+        <p>Iniciá sesión para descubrir películas, guardarlas en tu lista o descartar las que ya viste.</p>
         <button class="big-login-btn" id="loginBtn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Entrar con Google
@@ -128,7 +149,6 @@
             <button id="searchBtn" class="btn-primary">Buscar 5 Películas</button>
         </div>
 
-        <div class="loading" id="loader">🔄 Buscando joyas ocultas...</div>
         <div class="results-grid" id="resultsGrid"></div>
 
         <div class="reroll-container hidden" id="rerollBox">
@@ -136,10 +156,26 @@
         </div>
     </div>
 
+    <div id="profileModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Mi Perfil</h3>
+                <button class="close-btn" id="closeModalBtn">✕</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="tabWatchlist">📌 Para ver</button>
+                <button class="tab-btn" id="tabHistory">👁️ Ya vistas</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="empty-msg">Cargando...</div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB4ma2wLrtYbA1DH66egvihFpVgBH5MTJk",
@@ -156,7 +192,9 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
+        let currentModalTab = 'watchlist'; // 'watchlist' o 'watched'
 
+        // --- AUTENTICACIÓN ---
         document.getElementById('loginBtn').addEventListener('click', () => signInWithPopup(auth, provider));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
@@ -166,7 +204,6 @@
                 document.getElementById('welcomeScreen').classList.add('hidden');
                 document.getElementById('loggedInView').classList.remove('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
-                
                 document.getElementById('userPic').src = user.photoURL;
                 document.getElementById('userName').innerText = user.displayName.split(' ')[0];
             } else {
@@ -174,18 +211,41 @@
                 document.getElementById('welcomeScreen').classList.remove('hidden');
                 document.getElementById('loggedInView').classList.add('hidden');
                 document.getElementById('mainApp').classList.add('hidden');
-                
                 document.getElementById('resultsGrid').innerHTML = '';
                 document.getElementById('rerollBox').classList.add('hidden');
             }
         });
 
+        // --- CREADOR DE SKELETONS (Carga Moderna) ---
+        function renderSkeletons() {
+            const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                grid.innerHTML += `
+                    <div class="result-card" style="border-color: #333;">
+                        <div class="poster-container skeleton"></div>
+                        <div class="info-container">
+                            <div class="skeleton" style="width: 70%; height: 22px; margin-bottom: 12px; border-radius: 4px;"></div>
+                            <div class="skeleton" style="width: 40%; height: 16px; margin-bottom: 15px; border-radius: 4px;"></div>
+                            <div class="skeleton" style="width: 100%; height: 60px; margin-bottom: 15px; border-radius: 4px; flex-grow: 1;"></div>
+                            <div style="display: flex; gap: 8px; margin-top: auto;">
+                                <div class="skeleton" style="width: 100%; height: 38px; border-radius: 8px;"></div>
+                                <div class="skeleton" style="width: 100%; height: 38px; border-radius: 8px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // --- BÚSQUEDA DE PELÍCULAS ---
         async function fetchMovies() {
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('resultsGrid').innerHTML = '';
             document.getElementById('searchBtn').disabled = true;
             document.getElementById('rerollBtn').disabled = true;
             document.getElementById('rerollBox').classList.add('hidden');
+            
+            // Mostrar Skeletons
+            renderSkeletons();
 
             const genres = document.getElementById('themeFilter').value;
             const timeFilter = document.getElementById('timeFilter').value;
@@ -193,14 +253,9 @@
 
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/movie?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100`; 
             if (genres) url += `&with_genres=${genres}`;
-            
-            if (timeFilter === 'corta') {
-                url += `&with_runtime.lte=80`;
-            } else if (timeFilter === 'normal') {
-                url += `&with_runtime.gte=81&with_runtime.lte=109`; 
-            } else if (timeFilter === 'larga') {
-                url += `&with_runtime.gte=110`; 
-            }
+            if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
+            else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=109`; 
+            else if (timeFilter === 'larga') url += `&with_runtime.gte=110`; 
 
             try {
                 const response = await fetch(url);
@@ -212,49 +267,70 @@
                 for (let movie of movies) {
                     if (finalMovies.length >= 5) break; 
                     
-                    let isWatched = false;
+                    let isFilteredOut = false;
                     if (currentUser) {
-                        const docRef = doc(db, "users", currentUser.uid, "watched", movie.id.toString());
-                        const docSnap = await getDoc(docRef);
-                        if (docSnap.exists()) isWatched = true;
+                        // Revisar si ya la vio
+                        const docWatched = await getDoc(doc(db, "users", currentUser.uid, "watched", movie.id.toString()));
+                        // Revisar si ya la guardó para después
+                        const docWatchlist = await getDoc(doc(db, "users", currentUser.uid, "watchlist", movie.id.toString()));
+                        
+                        if (docWatched.exists() || docWatchlist.exists()) isFilteredOut = true;
                     }
-                    if (!isWatched) finalMovies.push(movie);
+                    if (!isFilteredOut) finalMovies.push(movie);
                 }
 
                 if (finalMovies.length > 0) {
                     await renderMovies(finalMovies);
                 } else {
-                    alert("Parece que ya viste todas las películas de esta página. ¡Volvé a intentar!");
+                    document.getElementById('resultsGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #aaa;">Ya tenés registradas todas las películas de esta página. ¡Volvé a intentar!</div>';
                 }
                 document.getElementById('rerollBox').classList.remove('hidden');
 
             } catch (error) {
                 console.error(error);
-                alert("Error al conectar con la base de datos de películas. Revisá la consola.");
+                alert("Error al conectar con TMDB. Revisá la consola.");
             } finally {
-                document.getElementById('loader').style.display = 'none';
                 document.getElementById('searchBtn').disabled = false;
                 document.getElementById('rerollBtn').disabled = false;
             }
         }
 
+        // --- RENDERIZAR RESULTADOS (Y traer Actores/Director) ---
         async function renderMovies(movies) {
             const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = ''; // Limpiamos los skeletons
             
             for (let movie of movies) {
                 let providersHTML = '<span class="no-providers">No disponible en streaming</span>';
+                let director = "Desconocido";
+                let mainCast = "No disponible";
+
                 try {
-                    const provUrl = `https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers`;
-                    const provRes = await fetch(provUrl);
+                    // Llamamos a los providers y a los detalles (créditos) en simultáneo para que sea rápido
+                    const [provRes, detailsRes] = await Promise.all([
+                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers`),
+                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}?language=es-MX&append_to_response=credits`)
+                    ]);
+
                     const provData = await provRes.json();
+                    const detailsData = await detailsRes.json();
                     
+                    // Extraer Streaming AR
                     if (provData.results && provData.results.AR && provData.results.AR.flatrate) {
                         providersHTML = '';
                         provData.results.AR.flatrate.slice(0, 4).forEach(platform => {
                             providersHTML += `<img src="https://image.tmdb.org/t/p/w45${platform.logo_path}" class="provider-icon" title="${platform.provider_name}" alt="${platform.provider_name}">`;
                         });
                     }
-                } catch (e) { console.error("Error cargando providers", e); }
+
+                    // Extraer Director y Cast
+                    if (detailsData.credits) {
+                        const dirObj = detailsData.credits.crew.find(c => c.job === 'Director');
+                        if (dirObj) director = dirObj.name;
+                        mainCast = detailsData.credits.cast.slice(0, 3).map(c => c.name).join(', ') || mainCast;
+                    }
+
+                } catch (e) { console.error("Error extra data", e); }
 
                 const posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster";
                 const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
@@ -273,46 +349,71 @@
                             <span class="badge rating-badge">★ ${movie.vote_average.toFixed(1)}</span>
                         </div>
                         <div class="providers-container">${providersHTML}</div>
-                        <div class="movie-desc">${movie.overview || "Sin descripción."}</div>
+                        <div class="movie-credits">🎬 <b>Dir:</b> ${director} <br> 👥 <b>Con:</b> ${mainCast}</div>
+                        <div class="movie-desc">${movie.overview || "Sin descripción disponible."}</div>
+                        
                         <div class="card-actions">
-                            <a href="${trailerLink}" target="_blank" class="trailer-btn">▶ Tráiler</a>
-                            <button class="watched-btn" title="Marcar como vista" data-id="${movie.id}" data-title="${movie.title}">👁️ Ya la vi</button>
+                            <a href="${trailerLink}" target="_blank" class="action-btn">▶ Tráiler</a>
+                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${movie.id}" data-title="${movie.title}">📌</button>
+                            <button class="action-btn watched-btn" title="Marcar como vista" data-id="${movie.id}" data-title="${movie.title}">👁️ Ya la vi</button>
                         </div>
                     </div>
                 `;
                 grid.appendChild(cardDiv);
             }
 
-            document.querySelectorAll('.watched-btn').forEach(btn => {
+            // Asignar eventos de los botones (Guardar y Vista)
+            assignCardEvents();
+        }
+
+        function assignCardEvents() {
+            // Guardar para después (Watchlist)
+            document.querySelectorAll('.save-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if (!currentUser) return;
-                    
                     const movieId = e.currentTarget.getAttribute('data-id');
                     const movieTitle = e.currentTarget.getAttribute('data-title');
                     const card = document.getElementById(`movie-card-${movieId}`);
                     const button = e.currentTarget;
                     
-                    // Mostramos estado de carga
                     card.style.opacity = '0.8';
-                    button.innerText = "⏳ Guardando...";
-                    button.disabled = true; // Evita doble clic
+                    button.innerText = "⏳";
+                    button.disabled = true;
 
                     try {
-                        await setDoc(doc(db, "users", currentUser.uid, "watched", movieId), {
-                            title: movieTitle,
-                            addedAt: new Date()
-                        });
-                        
-                        // Si se guardó bien, aplicamos el efecto "grayed out"
-                        card.style.opacity = ''; // Limpiamos el opacity temporal
+                        await setDoc(doc(db, "users", currentUser.uid, "watchlist", movieId), { title: movieTitle, addedAt: new Date() });
+                        card.style.opacity = '';
                         card.classList.add('grayed-out');
-                        button.innerText = "✅ Vista";
-                        
+                        button.innerText = "✅";
                     } catch (error) {
-                        console.error("Error guardando:", error);
-                        alert("Hubo un error al guardar.");
-                        
-                        // Revertimos cambios si falla
+                        console.error("Error:", error);
+                        card.style.opacity = '';
+                        button.innerText = "📌";
+                        button.disabled = false;
+                    }
+                });
+            });
+
+            // Marcar como Vista
+            document.querySelectorAll('.watched-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (!currentUser) return;
+                    const movieId = e.currentTarget.getAttribute('data-id');
+                    const movieTitle = e.currentTarget.getAttribute('data-title');
+                    const card = document.getElementById(`movie-card-${movieId}`);
+                    const button = e.currentTarget;
+                    
+                    card.style.opacity = '0.8';
+                    button.innerText = "⏳";
+                    button.disabled = true;
+
+                    try {
+                        await setDoc(doc(db, "users", currentUser.uid, "watched", movieId), { title: movieTitle, addedAt: new Date() });
+                        card.style.opacity = '';
+                        card.classList.add('grayed-out');
+                        button.innerText = "✅";
+                    } catch (error) {
+                        console.error("Error:", error);
                         card.style.opacity = '';
                         button.innerText = "👁️ Ya la vi";
                         button.disabled = false;
@@ -321,6 +422,93 @@
             });
         }
 
+        // --- SISTEMA DE MODAL (Perfil) ---
+        const modal = document.getElementById('profileModal');
+        const modalBody = document.getElementById('modalBody');
+
+        document.getElementById('openProfileBtn').addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            loadProfileData('watchlist'); // Carga pendientes por defecto
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.add('hidden'));
+        
+        // Cerrar modal tocando afuera
+        modal.addEventListener('click', (e) => {
+            if(e.target === modal) modal.classList.add('hidden');
+        });
+
+        // Tabs del modal
+        document.getElementById('tabWatchlist').addEventListener('click', (e) => {
+            document.getElementById('tabHistory').classList.remove('active');
+            e.target.classList.add('active');
+            loadProfileData('watchlist');
+        });
+        
+        document.getElementById('tabHistory').addEventListener('click', (e) => {
+            document.getElementById('tabWatchlist').classList.remove('active');
+            e.target.classList.add('active');
+            loadProfileData('watched');
+        });
+
+        // Cargar listas desde Firebase
+        async function loadProfileData(collectionName) {
+            if(!currentUser) return;
+            modalBody.innerHTML = '<div class="empty-msg">Cargando datos...</div>';
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "users", currentUser.uid, collectionName));
+                if (querySnapshot.empty) {
+                    modalBody.innerHTML = `<div class="empty-msg">Tu lista está vacía.</div>`;
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    // Link directo al trailer por si quieren verla desde acá
+                    const trailerLink = `https://www.youtube.com/results?search_query=trailer+español+latino+${encodeURIComponent(data.title)}`;
+                    html += `
+                        <div class="list-item" id="list-item-${docSnap.id}">
+                            <div class="list-item-title">
+                                <a href="${trailerLink}" target="_blank" style="color: white; text-decoration: none;">▶ ${data.title}</a>
+                            </div>
+                            <button class="delete-btn" onclick="removeFromList('${collectionName}', '${docSnap.id}')">Eliminar</button>
+                        </div>
+                    `;
+                });
+                modalBody.innerHTML = html;
+            } catch(e) {
+                console.error(e);
+                modalBody.innerHTML = '<div class="empty-msg">Error al cargar la lista.</div>';
+            }
+        }
+
+        // Eliminar elemento de Firebase (Expuesto globalmente para el onClick de la lista)
+        window.removeFromList = async function(collectionName, docId) {
+            if(confirm('¿Seguro que querés eliminar esta película de tu lista?')) {
+                const btn = document.querySelector(`#list-item-${docId} .delete-btn`);
+                btn.innerText = "Borrando...";
+                btn.disabled = true;
+                
+                try {
+                    await deleteDoc(doc(db, "users", currentUser.uid, collectionName, docId));
+                    document.getElementById(`list-item-${docId}`).remove();
+                    
+                    // Si quedó vacía la lista
+                    if(document.querySelectorAll('.list-item').length === 0) {
+                        modalBody.innerHTML = `<div class="empty-msg">Tu lista está vacía.</div>`;
+                    }
+                } catch(e) {
+                    console.error("Error al borrar:", e);
+                    alert("Error al intentar eliminar.");
+                    btn.innerText = "Eliminar";
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Iniciar App
         document.getElementById('searchBtn').addEventListener('click', fetchMovies);
         document.getElementById('rerollBtn').addEventListener('click', fetchMovies);
     </script>
