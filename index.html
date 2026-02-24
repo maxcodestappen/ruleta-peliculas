@@ -48,12 +48,11 @@
         .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; max-width: 1280px; }
         .result-card { background-color: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2a2a2a; transition: 0.4s ease; position: relative; }
         .result-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
-        .grayed-out { opacity: 0.4; filter: grayscale(100%); transform: scale(0.98); } /* pointer-events: none eliminado para permitir interaccion */
+        .grayed-out { opacity: 0.4; filter: grayscale(100%); transform: scale(0.98); }
         
         .skeleton { animation: shimmer 1.5s infinite linear; background: linear-gradient(to right, #252525 4%, #333 25%, #252525 36%); background-size: 1000px 100%; }
         @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
         
-        /* Aspect Ratio aplicado al póster para evitar cortes */
         .poster-container { width: 100%; aspect-ratio: 2 / 3; height: auto; background-color: #000; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .poster-container img { width: 100%; height: 100%; object-fit: cover; }
         .info-container { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
@@ -74,7 +73,7 @@
         .badge { background: #252525; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
         .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
         
-        .cert-badge { background: transparent; border: 1px solid #666; color: #ddd; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; } /* Cursor cambiado a pointer */
+        .cert-badge { background: transparent; border: 1px solid #666; color: #ddd; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; }
         
         .movie-credits { font-size: 0.8rem; color: #888; margin-bottom: 10px; line-height: 1.4; border-top: 1px solid #333; padding-top: 10px; }
         .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 130px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
@@ -260,7 +259,6 @@
             <option value="37">🤠 Western</option>
         `;
 
-        // Tiempos actualizados a lógica "hasta X"
         const timeMovie = `
             <option value="cualquiera" selected>⏱️ Sin límite</option>
             <option value="80">⚡ Hasta 1:20h</option>
@@ -320,7 +318,6 @@
             if (!isLoadMore) grid.innerHTML = '';
             
             let skeletonHTML = '';
-            // Aumentado a 10
             for (let i = 0; i < 10; i++) {
                 skeletonHTML += `
                     <div class="result-card skeleton-card" style="border-color: #333;">
@@ -366,12 +363,10 @@
                 else url += `&without_genres=10751,10762`;
             }
 
-            // Lógica de tiempo actualizada (Hasta X)
             if (timeFilter !== 'cualquiera') {
                 url += `&with_runtime.lte=${timeFilter}`;
             }
 
-            // Lógica de filtro por año
             if (yearFilter) {
                 if (currentMode === 'movie') {
                     url += `&primary_release_date.gte=${yearFilter}-01-01`;
@@ -388,7 +383,7 @@
                 let finalResults = [];
                 
                 for (let item of results) {
-                    if (finalResults.length >= 10) break; // Aumentado a 10 resultados
+                    if (finalResults.length >= 10) break; 
                     
                     let isFilteredOut = false;
                     let dbId = `${currentMode}_${item.id}`; 
@@ -504,7 +499,6 @@
                 const dbId = `${currentMode}_${item.id}`;
                 
                 const ratingTip = ratingExplanations[ageRating] || "Clasificación de edad según el país de origen";
-                // Añadido onclick para disparar la explicación en mobile
                 const certBadgeHTML = ageRating ? `<span class="badge cert-badge" title="${ratingTip}" onclick="alert('${ratingTip}')">${ageRating}</span>` : '';
 
                 const cardDiv = document.createElement('div');
@@ -526,8 +520,8 @@
                         
                         <div class="card-actions">
                             <a href="${trailerLink}" target="_blank" class="action-btn trailer-btn">▶ Tráiler</a>
-                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">⏳</button>
-                            <button class="action-btn watched-btn" title="No recomendar más" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">🚫</button>
+                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${dbId}" data-title="${title}" data-type="${currentMode}" data-active="false">⏳</button>
+                            <button class="action-btn watched-btn" title="No recomendar más" data-id="${dbId}" data-title="${title}" data-type="${currentMode}" data-active="false">🚫</button>
                         </div>
                     </div>
                 `;
@@ -538,6 +532,7 @@
         }
 
         function assignCardEvents() {
+            // Lógica para el botón de Guardar
             document.querySelectorAll('.save-btn').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
             document.querySelectorAll('.save-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
@@ -547,24 +542,41 @@
                     const type = e.currentTarget.getAttribute('data-type');
                     const card = document.getElementById(`card-${dbId}`);
                     const button = e.currentTarget;
+                    const isActive = button.getAttribute('data-active') === 'true';
                     
                     card.style.opacity = '0.8';
                     button.innerText = "…";
                     button.disabled = true;
 
                     try {
-                        await setDoc(doc(db, "users", currentUser.uid, "watchlist", dbId), { title: title, type: type, addedAt: new Date() });
-                        card.style.opacity = '';
-                        card.classList.add('grayed-out');
-                        button.innerText = "✅";
+                        if (isActive) {
+                            // Acción de Deshacer
+                            await deleteDoc(doc(db, "users", currentUser.uid, "watchlist", dbId));
+                            button.innerText = "⏳";
+                            button.setAttribute('data-active', 'false');
+                            
+                            // Comprobar que el otro botón no esté activo para sacarle el gris a la tarjeta
+                            const otherBtn = card.querySelector('.watched-btn');
+                            if (otherBtn.getAttribute('data-active') !== 'true') {
+                                card.classList.remove('grayed-out');
+                            }
+                        } else {
+                            // Acción de Guardar
+                            await setDoc(doc(db, "users", currentUser.uid, "watchlist", dbId), { title: title, type: type, addedAt: new Date() });
+                            card.classList.add('grayed-out');
+                            button.innerText = "✅";
+                            button.setAttribute('data-active', 'true');
+                        }
                     } catch (error) {
+                        button.innerText = isActive ? "✅" : "⏳";
+                    } finally {
                         card.style.opacity = '';
-                        button.innerText = "⏳";
-                        button.disabled = false;
+                        button.disabled = false; // Se vuelve a habilitar para que se pueda volver a clickear
                     }
                 });
             });
 
+            // Lógica para el botón de No recomendar
             document.querySelectorAll('.watched-btn').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
             document.querySelectorAll('.watched-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
@@ -574,20 +586,36 @@
                     const type = e.currentTarget.getAttribute('data-type');
                     const card = document.getElementById(`card-${dbId}`);
                     const button = e.currentTarget;
+                    const isActive = button.getAttribute('data-active') === 'true';
                     
                     card.style.opacity = '0.8';
                     button.innerText = "…";
                     button.disabled = true;
 
                     try {
-                        await setDoc(doc(db, "users", currentUser.uid, "watched", dbId), { title: title, type: type, addedAt: new Date() });
-                        card.style.opacity = '';
-                        card.classList.add('grayed-out');
-                        button.innerText = "✅";
+                        if (isActive) {
+                            // Acción de Deshacer
+                            await deleteDoc(doc(db, "users", currentUser.uid, "watched", dbId));
+                            button.innerText = "🚫";
+                            button.setAttribute('data-active', 'false');
+                            
+                            // Comprobar que el otro botón no esté activo para sacarle el gris a la tarjeta
+                            const otherBtn = card.querySelector('.save-btn');
+                            if (otherBtn.getAttribute('data-active') !== 'true') {
+                                card.classList.remove('grayed-out');
+                            }
+                        } else {
+                            // Acción de Guardar
+                            await setDoc(doc(db, "users", currentUser.uid, "watched", dbId), { title: title, type: type, addedAt: new Date() });
+                            card.classList.add('grayed-out');
+                            button.innerText = "✅";
+                            button.setAttribute('data-active', 'true');
+                        }
                     } catch (error) {
+                        button.innerText = isActive ? "✅" : "🚫";
+                    } finally {
                         card.style.opacity = '';
-                        button.innerText = "🚫";
-                        button.disabled = false;
+                        button.disabled = false; // Se vuelve a habilitar para que se pueda volver a clickear
                     }
                 });
             });
