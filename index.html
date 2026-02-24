@@ -34,15 +34,20 @@
 
         .app-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
         
-        /* SWITCH PELÍCULAS/SERIES */
         .type-toggle { display: flex; background: var(--bg-inputs); border-radius: 30px; padding: 5px; margin-bottom: 25px; border: 1px solid #333; }
         .type-btn { background: transparent; color: var(--text-secondary); border: none; padding: 10px 25px; border-radius: 25px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; }
         .type-btn.active { background: #444; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #555; }
 
-        .controls { background-color: var(--bg-card); padding: 25px; border-radius: var(--radius-lg); display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; width: 100%; max-width: 900px; border: 1px solid #2a2a2a; }
+        .controls { background-color: var(--bg-card); padding: 25px; border-radius: var(--radius-lg); display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; margin-bottom: 40px; width: 100%; max-width: 1000px; border: 1px solid #2a2a2a; }
         select, button { padding: 12px 20px; font-size: 15px; border-radius: var(--radius-sm); border: none; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
-        select { background-color: var(--bg-inputs); color: var(--text-primary); flex-grow: 1; }
-        .btn-primary { background: var(--accent-color); color: white; flex-grow: 1; transition: 0.2s; }
+        select { background-color: var(--bg-inputs); color: var(--text-primary); flex-grow: 1; min-width: 200px; }
+        
+        /* ESTILO PARA EL CHECKBOX INFANTIL */
+        .checkbox-label { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.95rem; cursor: pointer; background: var(--bg-inputs); padding: 10px 15px; border-radius: var(--radius-sm); border: 1px solid #333; transition: 0.2s; white-space: nowrap; height: 100%; box-sizing: border-box; font-weight: 600;}
+        .checkbox-label:hover { border-color: #555; color: white; }
+        .checkbox-label input { width: 16px; height: 16px; accent-color: var(--accent-color); cursor: pointer; margin: 0; }
+
+        .btn-primary { background: var(--accent-color); color: white; flex-grow: 1; transition: 0.2s; min-width: 200px; }
         .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
         .btn-primary:disabled { background-color: #444; color: #888; cursor: not-allowed; transform: none; }
 
@@ -133,6 +138,12 @@
         <div class="controls">
             <select id="themeFilter"></select>
             <select id="timeFilter"></select>
+            
+            <label class="checkbox-label" title="Oculta contenido clasificado como Familiar o Infantil">
+                <input type="checkbox" id="excludeKids" checked>
+                🚫 Sin contenido infantil
+            </label>
+
             <button id="searchBtn" class="btn-primary">Buscar 5 Resultados</button>
         </div>
 
@@ -179,9 +190,8 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
-        let currentMode = 'movie'; // 'movie' o 'tv'
+        let currentMode = 'movie'; 
 
-        // --- DICCIONARIOS DINÁMICOS PARA FILTROS ---
         const genresMovie = `
             <option value="">🎲 Sorpréndeme (Todas)</option>
             <option value="28">💥 Acción</option>
@@ -257,14 +267,10 @@
             document.getElementById('rerollBox').classList.add('hidden');
         }
 
-        // Eventos del Switcher
         document.getElementById('modeMovieBtn').addEventListener('click', () => { currentMode = 'movie'; updateUIForMode(); });
         document.getElementById('modeTvBtn').addEventListener('click', () => { currentMode = 'tv'; updateUIForMode(); });
-
-        // Iniciar UI
         updateUIForMode();
 
-        // --- AUTENTICACIÓN ---
         document.getElementById('loginBtn').addEventListener('click', () => signInWithPopup(auth, provider));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
@@ -318,6 +324,7 @@
 
             const genres = document.getElementById('themeFilter').value;
             const timeFilter = document.getElementById('timeFilter').value;
+            const excludeKids = document.getElementById('excludeKids').checked;
             const randomPage = Math.floor(Math.random() * 10) + 1;
 
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/${currentMode}?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
@@ -327,12 +334,21 @@
                 else url += `&with_genres=${genres}`;
             }
 
-            // Lógica de Tiempos adaptada según modo
+            // LÓGICA EXCLUIR INFANTIL
+            // Evitamos bloquearlo si el usuario explícitamente eligió "Familiar" (10751) o "Infantil" (10762)
+            if (excludeKids && genres !== '10751' && genres !== '10762') {
+                if (currentMode === 'movie') {
+                    url += `&without_genres=10751`;
+                } else {
+                    url += `&without_genres=10751,10762`;
+                }
+            }
+
             if (currentMode === 'movie') {
                 if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
                 else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=109`; 
                 else if (timeFilter === 'larga') url += `&with_runtime.gte=110`; 
-            } else { // Series (duración de capítulos)
+            } else {
                 if (timeFilter === 'corta') url += `&with_runtime.lte=30`;
                 else if (timeFilter === 'normal') url += `&with_runtime.gte=31&with_runtime.lte=55`; 
                 else if (timeFilter === 'larga') url += `&with_runtime.gte=56`; 
@@ -349,12 +365,20 @@
                     if (finalResults.length >= 5) break; 
                     
                     let isFilteredOut = false;
-                    let dbId = `${currentMode}_${item.id}`; // Ej: movie_123 o tv_123
+                    let dbId = `${currentMode}_${item.id}`; 
+                    let legacyId = item.id.toString();
 
                     if (currentUser) {
-                        const docWatched = await getDoc(doc(db, "users", currentUser.uid, "watched", dbId));
-                        const docWatchlist = await getDoc(doc(db, "users", currentUser.uid, "watchlist", dbId));
-                        if (docWatched.exists() || docWatchlist.exists()) isFilteredOut = true;
+                        const [docWatched, docWatchlist, docWatchedLegacy, docWatchlistLegacy] = await Promise.all([
+                            getDoc(doc(db, "users", currentUser.uid, "watched", dbId)),
+                            getDoc(doc(db, "users", currentUser.uid, "watchlist", dbId)),
+                            currentMode === 'movie' ? getDoc(doc(db, "users", currentUser.uid, "watched", legacyId)) : Promise.resolve({exists: () => false}),
+                            currentMode === 'movie' ? getDoc(doc(db, "users", currentUser.uid, "watchlist", legacyId)) : Promise.resolve({exists: () => false})
+                        ]);
+                        
+                        if (docWatched.exists() || docWatchlist.exists() || docWatchedLegacy.exists() || docWatchlistLegacy.exists()) {
+                            isFilteredOut = true;
+                        }
                     }
                     if (!isFilteredOut) finalResults.push(item);
                 }
@@ -408,7 +432,6 @@
                         const dirObj = detailsData.credits.crew.find(c => c.job === 'Director');
                         if (dirObj) director = dirObj.name;
                     } else if (currentMode === 'tv' && detailsData.created_by) {
-                        // Series: mostrar Creadores
                         if (detailsData.created_by.length > 0) director = detailsData.created_by.map(c => c.name).join(', ');
                     }
 
@@ -423,11 +446,10 @@
                 const year = releaseDate ? releaseDate.split('-')[0] : 'N/A';
                 const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster";
                 
-                // Búsqueda de tráiler ajustada para series
                 const trailerQuery = currentMode === 'movie' ? `trailer español latino pelicula ${title}` : `trailer español latino serie ${title}`;
                 const trailerLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(trailerQuery)}`;
                 const dbId = `${currentMode}_${item.id}`;
-                const dirLabel = currentMode === 'movie' ? 'Dir' : 'Crea'; // Creador vs Director
+                const dirLabel = currentMode === 'movie' ? 'Dir' : 'Crea';
 
                 const cardDiv = document.createElement('div');
                 cardDiv.className = "result-card";
@@ -514,7 +536,6 @@
             });
         }
 
-        // --- MODAL DE PERFIL ---
         const modal = document.getElementById('profileModal');
         const modalBody = document.getElementById('modalBody');
 
@@ -560,7 +581,7 @@
                     html += `
                         <div class="list-item" id="list-item-${docSnap.id}">
                             <div class="list-item-title">
-                                <a href="${trailerLink}" target="_blank" style="color: white; text-decoration: none;">${icon} ${data.title}</a>
+                                <a href="${trailerLink}" target="_blank" style="color: white; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 300px;">${icon} ${data.title}</a>
                             </div>
                             <button class="delete-btn" onclick="removeFromList('${collectionName}', '${docSnap.id}')">Eliminar</button>
                         </div>
