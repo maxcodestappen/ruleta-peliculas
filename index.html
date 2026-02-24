@@ -529,8 +529,8 @@
                         
                         <div class="card-actions">
                             <a href="${trailerLink}" target="_blank" class="action-btn trailer-btn">▶ Tráiler</a>
-                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">⏳ Guardar</button>
-                            <button class="action-btn watched-btn" title="Marcar como vista" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">👁️ Ya la vi</button>
+                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">⏳</button>
+                            <button class="action-btn watched-btn" title="Marcar como vista" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">👁️</button>
                         </div>
                     </div>
                 `;
@@ -562,7 +562,7 @@
                         button.innerText = "✅";
                     } catch (error) {
                         card.style.opacity = '';
-                        button.innerText = "⏳ Guardar";
+                        button.innerText = "⏳";
                         button.disabled = false;
                     }
                 });
@@ -589,7 +589,7 @@
                         button.innerText = "✅";
                     } catch (error) {
                         card.style.opacity = '';
-                        button.innerText = "👁️ Ya la vi";
+                        button.innerText = "👁️";
                         button.disabled = false;
                     }
                 });
