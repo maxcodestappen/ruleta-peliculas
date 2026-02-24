@@ -18,7 +18,6 @@
         .header h1 { font-weight: 900; letter-spacing: -1px; margin: 0; font-size: 2rem; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .profile-btn { display: flex; align-items: center; gap: 10px; background: var(--bg-inputs); padding: 6px 15px; border-radius: 30px; border: 1px solid #333; cursor: pointer; transition: 0.2s; }
-        .profile-btn:hover { background: #333; border-color: #555; }
         .profile-btn img { width: 32px; height: 32px; border-radius: 50%; }
         .user-name { font-weight: 600; font-size: 0.95rem; }
         .btn-logout { background: transparent; color: var(--text-secondary); border: 1px solid #444; padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
@@ -61,13 +60,26 @@
         .poster-container { width: 100%; height: 330px; background-color: #000; position: relative; }
         .poster-container img { width: 100%; height: 100%; object-fit: cover; }
         .info-container { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-        .movie-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; line-height: 1.2; }
+
+        /* ARREGLO 1: Altura fija del título para alinear todo */
+        .movie-title { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+            line-height: 1.2; 
+            height: 2.4em; /* Obliga a 2 líneas de altura */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
         
-        /* METADATOS Y BADGES (AÑO, ESTRELLAS, EDAD) */
-        .movie-meta { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .movie-meta { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
         .badge { background: #252525; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
         .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
-        .cert-badge { background: transparent; border: 1px solid #666; color: #ddd; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; } /* Estilo específico para la edad */
+        
+        /* Tooltip simple nativo con title */
+        .cert-badge { background: transparent; border: 1px solid #666; color: #ddd; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; cursor: help; }
         
         .movie-credits { font-size: 0.8rem; color: #888; margin-bottom: 10px; line-height: 1.4; border-top: 1px solid #333; padding-top: 10px; }
         .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 130px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
@@ -76,12 +88,12 @@
         .provider-icon { width: 35px; height: 35px; border-radius: 8px; }
         .no-providers { font-size: 0.8rem; color: #777; font-style: italic; }
 
-        .card-actions { display: flex; gap: 8px; flex-wrap: nowrap; align-items: stretch; }
-        .action-btn { background-color: var(--bg-inputs); color: white; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: 0.2s; cursor: pointer; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .card-actions { display: flex; gap: 6px; flex-wrap: nowrap; align-items: stretch; }
+        .action-btn { background-color: var(--bg-inputs); color: white; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.8rem; font-weight: bold; transition: 0.2s; cursor: pointer; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 2px; text-align: center; }
         .action-btn:hover { background-color: #fff; color: #000; }
         
-        .trailer-btn { flex-grow: 1; padding: 10px; }
-        .save-btn, .watched-btn { flex: 0 0 50px; font-size: 1.2rem; padding: 0; } 
+        .trailer-btn { flex: 1.2; }
+        .save-btn, .watched-btn { flex: 1; } 
         .save-btn { background-color: rgba(255, 255, 255, 0.1); border: 1px solid #555; }
         .save-btn:hover { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
         .watched-btn { background-color: transparent; border: 1px solid #555; color: #aaa; }
@@ -193,6 +205,23 @@
 
         let currentUser = null;
         let currentMode = 'movie'; 
+
+        // Diccionario de traducciones para las edades (Argentina-friendly)
+        const ratingExplanations = {
+            "G": "Apto para Todo Público (ATP)",
+            "TV-G": "Apto para Todo Público (ATP)",
+            "PG": "Se recomienda guía de los padres",
+            "TV-PG": "Se recomienda guía de los padres",
+            "PG-13": "Apto mayores de 13 años (con guía)",
+            "TV-14": "Apto mayores de 14 años",
+            "R": "Restringido (Apto mayores de 17 años)",
+            "TV-MA": "Solo Público Adulto (+18)",
+            "NC-17": "Prohibido menores de 18 años",
+            "13": "Apto mayores de 13 años",
+            "16": "Apto mayores de 16 años",
+            "18": "Solo adultos (+18)",
+            "ATP": "Apto para Todo Público"
+        };
 
         const genresMovie = `
             <option value="">🎲 Sorpréndeme (Todas)</option>
@@ -307,8 +336,8 @@
                             <div class="skeleton" style="width: 100%; height: 130px; margin-bottom: 15px; border-radius: 4px; flex-grow: 1;"></div>
                             <div style="display: flex; gap: 8px; margin-top: auto;">
                                 <div class="skeleton" style="flex-grow: 1; height: 38px; border-radius: 8px;"></div>
-                                <div class="skeleton" style="flex: 0 0 50px; height: 38px; border-radius: 8px;"></div>
-                                <div class="skeleton" style="flex: 0 0 50px; height: 38px; border-radius: 8px;"></div>
+                                <div class="skeleton" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                                <div class="skeleton" style="flex: 1; height: 38px; border-radius: 8px;"></div>
                             </div>
                         </div>
                     </div>
@@ -330,7 +359,6 @@
             const randomPage = Math.floor(Math.random() * 10) + 1;
 
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/${currentMode}?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
-            
             url += `&without_keywords=210024`;
 
             if (genres) {
@@ -410,11 +438,10 @@
                 let providersHTML = '<span class="no-providers">No disponible en streaming</span>';
                 let director = "Desconocido";
                 let mainCast = "No disponible";
-                let ageRating = ""; // Variable para guardar la clasificación de edad
+                let ageRating = ""; 
                 let detailsData = {};
 
                 try {
-                    // SE AGREGA release_dates (pelis) y content_ratings (series) A LA LLAMADA DE LA API
                     const [provRes, detailsRes] = await Promise.all([
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/${currentMode}/${item.id}/watch/providers?language=es-AR`),
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/${currentMode}/${item.id}?language=es-MX&append_to_response=credits,translations,release_dates,content_ratings`)
@@ -441,7 +468,7 @@
                         mainCast = detailsData.credits.cast.slice(0, 3).map(c => c.name).join(', ') || mainCast;
                     }
 
-                    // --- EXTRACCIÓN DE EDAD RECOMENDADA (Prioriza US y AR) ---
+                    // --- EXTRACCIÓN DE EDAD RECOMENDADA ---
                     if (currentMode === 'movie' && detailsData.release_dates && detailsData.release_dates.results) {
                         const priorityCountries = ['US', 'AR', 'MX', 'ES'];
                         for (let country of priorityCountries) {
@@ -451,19 +478,11 @@
                                 if (cert) { ageRating = cert.certification; break; }
                             }
                         }
-                        if (!ageRating) {
-                            let anyRelease = detailsData.release_dates.results.find(r => r.release_dates.some(d => d.certification !== ""));
-                            if (anyRelease) ageRating = anyRelease.release_dates.find(d => d.certification !== "").certification;
-                        }
                     } else if (currentMode === 'tv' && detailsData.content_ratings && detailsData.content_ratings.results) {
                         const priorityCountries = ['US', 'AR', 'MX', 'ES'];
                         for (let country of priorityCountries) {
                             let ratingObj = detailsData.content_ratings.results.find(r => r.iso_3166_1 === country && r.rating !== "");
                             if (ratingObj) { ageRating = ratingObj.rating; break; }
-                        }
-                        if (!ageRating) {
-                            let anyRating = detailsData.content_ratings.results.find(r => r.rating !== "");
-                            if (anyRating) ageRating = anyRating.rating;
                         }
                     }
 
@@ -487,8 +506,9 @@
                 const dbId = `${currentMode}_${item.id}`;
                 const dirLabel = currentMode === 'movie' ? 'Dir' : 'Crea';
                 
-                // Renderizado del HTML del badge de edad si existe
-                const certBadgeHTML = ageRating ? `<span class="badge cert-badge" title="Clasificación por edades">${ageRating}</span>` : '';
+                // --- EXPLICACIÓN AL HOVER ---
+                const ratingTip = ratingExplanations[ageRating] || "Clasificación de edad según el país de origen";
+                const certBadgeHTML = ageRating ? `<span class="badge cert-badge" title="${ratingTip}">${ageRating}</span>` : '';
 
                 const cardDiv = document.createElement('div');
                 cardDiv.className = "result-card";
@@ -501,15 +521,16 @@
                         <div class="movie-meta">
                             <span class="badge">${year}</span>
                             <span class="badge rating-badge">★ ${item.vote_average.toFixed(1)}</span>
-                            ${certBadgeHTML} </div>
+                            ${certBadgeHTML}
+                        </div>
                         <div class="providers-container">${providersHTML}</div>
                         <div class="movie-credits">🎬 <b>${dirLabel}:</b> ${director} <br> 👥 <b>Con:</b> ${mainCast}</div>
                         <div class="movie-desc">${finalDesc}</div>
                         
                         <div class="card-actions">
                             <a href="${trailerLink}" target="_blank" class="action-btn trailer-btn">▶ Tráiler</a>
-                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">⏳</button>
-                            <button class="action-btn watched-btn" title="Marcar como vista" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">👁️</button>
+                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">⏳ Guardar</button>
+                            <button class="action-btn watched-btn" title="Marcar como vista" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">👁️ Ya la vi</button>
                         </div>
                     </div>
                 `;
@@ -541,7 +562,7 @@
                         button.innerText = "✅";
                     } catch (error) {
                         card.style.opacity = '';
-                        button.innerText = "⏳";
+                        button.innerText = "⏳ Guardar";
                         button.disabled = false;
                     }
                 });
@@ -568,7 +589,7 @@
                         button.innerText = "✅";
                     } catch (error) {
                         card.style.opacity = '';
-                        button.innerText = "👁️";
+                        button.innerText = "👁️ Ya la vi";
                         button.disabled = false;
                     }
                 });
