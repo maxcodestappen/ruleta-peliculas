@@ -3,441 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineFlow - Recomendador Moderno</title>
+    <title>CineFlow - Recomendador</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Paleta Moderna Oscura */
-            --bg-main: #0f0f0f; /* Negro profundo */
-            --bg-card: #181818; /* Gris muy oscuro para tarjetas */
-            --bg-inputs: #252525; /* Gris para inputs */
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0; /* Gris claro para subtítulos */
-            --accent-color: #ff3d47; /* Rojo vibrante moderno */
-            --accent-hover: #ff6b72;
-            --radius-lg: 16px;
-            --radius-sm: 8px;
+            --bg-main: #0f0f0f; --bg-card: #181818; --bg-inputs: #252525;
+            --text-primary: #ffffff; --text-secondary: #a0a0a0;
+            --accent-color: #ff3d47; --accent-hover: #ff6b72;
+            --radius-lg: 16px; --radius-sm: 8px;
         }
-        
         body {
-            font-family: 'Inter', sans-serif; /* Tipografía moderna */
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 40px 20px;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
+        h1 { font-weight: 900; letter-spacing: -1px; margin-bottom: 5px; text-align: center; font-size: 2.5rem; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p.subtitle { color: var(--text-secondary); margin-bottom: 30px; text-align: center; }
+        
+        /* Contenedor de Usuario / Login */
+        .auth-container {
+            display: flex; gap: 10px; align-items: center; margin-bottom: 30px; background: var(--bg-inputs); padding: 10px 20px; border-radius: 30px; border: 1px solid #333;
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-info img { width: 30px; height: 30px; border-radius: 50%; }
+        .btn-auth { background: #fff; color: #000; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn-auth:hover { background: #ddd; }
+        .btn-logout { background: transparent; color: var(--text-secondary); border: 1px solid #444; }
+        .btn-logout:hover { background: #333; color: #fff; }
 
-        h1 {
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 2.5rem;
-            background: linear-gradient(to right, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        p.subtitle {
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            text-align: center;
-            font-size: 1.1rem;
-            max-width: 600px;
-        }
-        
-        /* --- API BOX --- */
-        .api-box {
-            background: var(--bg-inputs);
-            padding: 15px 20px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 30px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            font-size: 0.9em;
-            border: 1px solid #333;
-        }
-        .api-box input {
-            background: var(--bg-main);
-            border: 1px solid #444;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-family: inherit;
-        }
+        .api-box { background: var(--bg-inputs); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 20px; display: flex; gap: 15px; border: 1px solid #333; }
+        .api-box input { background: #0f0f0f; border: 1px solid #444; color: white; padding: 8px; border-radius: 4px; }
         .hidden { display: none !important; }
 
-        /* --- CONTROLES DE BÚSQUEDA --- */
         .controls {
-            background-color: var(--bg-card);
-            padding: 25px;
-            border-radius: var(--radius-lg);
-            /* Sombra suave y moderna */
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 50px;
-            width: 100%;
-            max-width: 900px;
-            border: 1px solid #2a2a2a;
+            background-color: var(--bg-card); padding: 25px; border-radius: var(--radius-lg); display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; width: 100%; max-width: 900px; border: 1px solid #2a2a2a;
         }
-        
-        select, button {
-            padding: 14px 24px;
-            font-size: 16px;
-            border-radius: var(--radius-sm);
-            border: none;
-            outline: none;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        select {
-            background-color: var(--bg-inputs);
-            color: var(--text-primary);
-            cursor: pointer;
-            flex-grow: 1;
-            border: 1px solid transparent;
-        }
-        select:hover, select:focus {
-            background-color: #303030;
-            border-color: #444;
-        }
+        select, button { padding: 12px 20px; font-size: 15px; border-radius: var(--radius-sm); border: none; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
+        select { background-color: var(--bg-inputs); color: var(--text-primary); flex-grow: 1; }
+        .btn-primary { background: var(--accent-color); color: white; flex-grow: 1; transition: 0.2s; }
+        .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+        .btn-primary:disabled { background-color: #444; color: #888; cursor: not-allowed; transform: none; }
 
-        /* Botón Principal (Buscar) */
-        .btn-primary {
-            background: var(--accent-color);
-            color: white;
-            cursor: pointer;
-            flex-grow: 1;
-            box-shadow: 0 4px 15px -5px rgba(255, 61, 71, 0.5);
-        }
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px -5px rgba(255, 61, 71, 0.7);
-        }
-        .btn-primary:disabled {
-            background-color: #444;
-            color: #888;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; width: 100%; max-width: 1280px; }
+        .result-card { background-color: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2a2a2a; transition: 0.3s; position: relative; }
+        .result-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
+        
+        .poster-container { width: 100%; height: 360px; background-color: #000; }
+        .poster-container img { width: 100%; height: 100%; object-fit: cover; }
+        .info-container { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .movie-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; line-height: 1.2; }
+        .movie-meta { display: flex; gap: 10px; margin-bottom: 10px; }
+        .badge { background: #252525; padding: 4px 8px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+        .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
+        .movie-desc { font-size: 0.9rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 90px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        
+        .providers-container { display: flex; gap: 8px; margin-bottom: 15px; min-height: 35px; align-items: center; }
+        .provider-icon { width: 35px; height: 35px; border-radius: 8px; }
+        .no-providers { font-size: 0.8rem; color: #777; font-style: italic; }
 
-        /* Botón Secundario (Reroll) */
-        .btn-secondary {
-            background: transparent;
-            color: var(--accent-color);
-            border: 2px solid var(--accent-color);
-            cursor: pointer;
-        }
-        .btn-secondary:hover {
-            background: var(--accent-color);
-            color: white;
-        }
+        .card-actions { display: flex; gap: 10px; }
+        .trailer-btn { background-color: var(--bg-inputs); color: white; text-align: center; padding: 10px; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.9rem; flex-grow: 1; font-weight: bold; transition: 0.2s; }
+        .trailer-btn:hover { background-color: #fff; color: #000; }
+        .watched-btn { background-color: transparent; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: var(--radius-sm); cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .watched-btn:hover { background-color: #333; color: white; border-color: white; }
 
-        /* --- GRILLA DE RESULTADOS --- */
-        .results-grid {
-            display: grid;
-            /* Tarjetas un poco más anchas */
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 1280px;
-        }
-
-        /* --- TARJETA MODERNIZADA --- */
-        .result-card {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1); /* Animación de entrada suave */
-            border: 1px solid #2a2a2a;
-            transition: all 0.3s ease;
-        }
-        
-        /* Efecto hover en la tarjeta completa */
-        .result-card:hover {
-            transform: translateY(-7px);
-            border-color: var(--accent-color);
-            box-shadow: 0 15px 30px -10px rgba(255, 61, 71, 0.2);
-        }
-
-        .poster-container {
-            width: 100%;
-            height: 360px; /* Un poco más altas */
-            background-color: #000;
-            position: relative;
-        }
-        .poster-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        /* Zoom sutil en el póster al hacer hover */
-        .result-card:hover .poster-container img {
-            transform: scale(1.05);
-        }
-        
-        .info-container {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-        
-        .movie-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #fff;
-            line-height: 1.3;
-        }
-        
-        /* Badges para año y rating */
-        .movie-meta {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .badge {
-            background: #252525;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        .badge.rating-badge {
-            color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-        
-        /* Scrollbar minimalista moderna */
-        .movie-desc { 
-            font-size: 0.95rem; 
-            line-height: 1.6; 
-            color: #ccc; 
-            flex-grow: 1; 
-            margin-bottom: 20px; 
-            height: 110px;
-            overflow-y: auto;
-            padding-right: 10px;
-            /* Firefox */
-            scrollbar-width: thin;
-            scrollbar-color: #444 transparent;
-        }
-        /* Webkit (Chrome/Safari/Edge) */
-        .movie-desc::-webkit-scrollbar { width: 4px; }
-        .movie-desc::-webkit-scrollbar-track { background: transparent; }
-        .movie-desc::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
-        .movie-desc::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
-        
-        .trailer-btn {
-            background-color: var(--bg-inputs);
-            color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: var(--radius-sm);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .trailer-btn:hover {
-            background-color: white;
-            color: black;
-        }
-
-        /* --- Loading y Reroll --- */
-        .loading {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            font-weight: 600;
-            display: none;
-            margin: 30px 0;
-        }
-        
-        .reroll-container {
-            margin-top: 50px;
-            margin-bottom: 80px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .loading { font-size: 1.2rem; color: var(--accent-color); font-weight: 600; display: none; margin: 30px 0; }
+        .reroll-container { margin-top: 40px; margin-bottom: 60px; width: 100%; max-width: 400px; }
+        .btn-secondary { background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); width: 100%; padding: 15px; }
+        .btn-secondary:hover { background: var(--accent-color); color: white; }
     </style>
 </head>
 <body>
 
     <h1>🎬 CineFlow</h1>
-    <p class="subtitle">Tu próxima película favorita, servida en segundos.</p>
+    <p class="subtitle">Logueate, descubrí películas y descartá las que ya viste.</p>
+
+    <div class="auth-container">
+        <div id="loggedOutView">
+            <button class="btn-auth" id="loginBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Entrar con Google
+            </button>
+        </div>
+        <div id="loggedInView" class="user-info hidden">
+            <img id="userPic" src="" alt="User">
+            <span id="userName">Usuario</span>
+            <button class="btn-auth btn-logout" id="logoutBtn">Salir</button>
+        </div>
+    </div>
 
     <div id="apiBox" class="api-box">
         <span>🔑 API Key de TMDB:</span>
-        <input type="text" id="apiKeyInput" placeholder="Pega tu clave aquí">
-        <button onclick="saveApiKey()" class="btn-primary" style="padding: 8px 15px;">Guardar</button>
+        <input type="text" id="apiKeyInput" placeholder="Pega tu clave">
+        <button id="saveApiBtn" class="btn-primary" style="padding: 8px 15px;">Guardar</button>
     </div>
 
     <div class="controls">
         <select id="themeFilter">
-            <option value="">🎲 Sorpréndeme (Cualquiera)</option>
+            <option value="">🎲 Sorpréndeme</option>
             <option value="18,53">🏛️ Intriga y Poder</option>
             <option value="878">💻 Cyberpunk & Futuro</option>
             <option value="12">✈️ Aventuras Épicas</option>
             <option value="28">💥 Adrenalina Pura</option>
-            <option value="35">😂 Para reír un rato</option>
+            <option value="35">😂 Comedia</option>
             <option value="27">👻 Terror Moderno</option>
         </select>
-
         <select id="timeFilter">
+            <option value="cualquiera" selected>⏱️ Sin límite</option>
             <option value="corta">⚡ Corta (≤ 1:20h)</option>
             <option value="normal">⏳ Normal (1:20h - 1:45h)</option>
             <option value="larga">🍿 Larga (+1:45h)</option>
         </select>
-
-        <button onclick="fetchMovies()" id="searchBtn" class="btn-primary">Buscar 5 Películas</button>
+        <button id="searchBtn" class="btn-primary">Buscar 4 Películas</button>
     </div>
 
-    <div class="loading" id="loader">
-        <span style="display: inline-block; animation: spin 1s linear infinite;">🔄</span> Buscando joyas ocultas...
-    </div>
-
+    <div class="loading" id="loader">🔄 Buscando joyas ocultas...</div>
     <div class="results-grid" id="resultsGrid"></div>
 
     <div class="reroll-container hidden" id="rerollBox">
-        <button onclick="fetchMovies()" class="btn-secondary" style="width: 100%; font-size: 18px; padding: 15px;">🎲 Reroll (Probar otra vez)</button>
+        <button id="rerollBtn" class="btn-secondary">🎲 Reroll (Probar otra vez)</button>
     </div>
 
-    <script>
-        // EL JAVASCRIPT NO CAMBIA, ES EL MISMO QUE ANTES
-        checkApiKey();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        function checkApiKey() {
-            if (localStorage.getItem('tmdb_api_key')) {
-                document.getElementById('apiBox').classList.add('hidden');
-            }
-        }
+        // TU CONFIGURACIÓN DE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyB4ma2wLrtYbA1DH66egvihFpVgBH5MTJk",
+            authDomain: "cineflow-ab20f.firebaseapp.com",
+            projectId: "cineflow-ab20f",
+            storageBucket: "cineflow-ab20f.firebasestorage.app",
+            messagingSenderId: "1002789934764",
+            appId: "1:1002789934764:web:f185c4a05ea9a03b0ff109"
+        };
 
-        function saveApiKey() {
-            const input = document.getElementById('apiKeyInput').value.trim();
-            if (input) {
-                localStorage.setItem('tmdb_api_key', input);
-                location.reload();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentUser = null;
+
+        // --- SISTEMA DE LOGIN ---
+        document.getElementById('loginBtn').addEventListener('click', () => signInWithPopup(auth, provider));
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('loggedOutView').classList.add('hidden');
+                document.getElementById('loggedInView').classList.remove('hidden');
+                document.getElementById('userPic').src = user.photoURL;
+                document.getElementById('userName').innerText = user.displayName.split(' ')[0];
             } else {
-                alert("Por favor pega una clave válida.");
+                currentUser = null;
+                document.getElementById('loggedOutView').classList.remove('hidden');
+                document.getElementById('loggedInView').classList.add('hidden');
             }
-        }
+        });
 
+        // --- MANEJO DE TMDB API KEY ---
+        if (localStorage.getItem('tmdb_api_key')) document.getElementById('apiBox').classList.add('hidden');
+        
+        document.getElementById('saveApiBtn').addEventListener('click', () => {
+            const val = document.getElementById('apiKeyInput').value.trim();
+            if(val) { localStorage.setItem('tmdb_api_key', val); location.reload(); }
+        });
+
+        // --- LÓGICA DE BÚSQUEDA ---
         async function fetchMovies() {
             const apiKey = localStorage.getItem('tmdb_api_key');
-            if (!apiKey) return alert("Primero necesitas ingresar tu API Key de TMDB arriba 👆");
+            if (!apiKey) return alert("Ingresá tu API Key de TMDB arriba.");
 
-            const loader = document.getElementById('loader');
-            const grid = document.getElementById('resultsGrid');
-            const btn = document.getElementById('searchBtn');
-            const rerollBox = document.getElementById('rerollBox');
-            
-            grid.innerHTML = ''; 
-            loader.style.display = 'block';
-            btn.disabled = true;
-            rerollBox.classList.add('hidden');
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('resultsGrid').innerHTML = '';
+            document.getElementById('searchBtn').disabled = true;
+            document.getElementById('rerollBtn').disabled = true;
+            document.getElementById('rerollBox').classList.add('hidden');
 
             const genres = document.getElementById('themeFilter').value;
             const timeFilter = document.getElementById('timeFilter').value;
-            const randomPage = Math.floor(Math.random() * 10) + 1; // Aumenté el rango de páginas para más variedad
+            const randomPage = Math.floor(Math.random() * 10) + 1;
 
-            let url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=es-ES&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100`; // Agregué filtro de votos mínimos para evitar películas muy desconocidas
-            
+            let url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&language=es-ES&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100`; 
             if (genres) url += `&with_genres=${genres}`;
-            
-            if (timeFilter === 'corta') {
-                url += `&with_runtime.lte=80`;
-            } else if (timeFilter === 'normal') {
-                url += `&with_runtime.gte=81&with_runtime.lte=105`;
-            } else if (timeFilter === 'larga') {
-                url += `&with_runtime.gte=106`;
-            }
+            if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
+            else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=105`;
+            else if (timeFilter === 'larga') url += `&with_runtime.gte=106`;
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-
-                if (data.results && data.results.length >= 5) {
-                    const top5 = data.results.sort(() => 0.5 - Math.random()).slice(0, 5);
-                    renderMovies(top5);
-                    rerollBox.classList.remove('hidden');
-                } else if (data.results && data.results.length > 0) {
-                     // Si hay menos de 5, mostramos las que haya
-                    renderMovies(data.results);
-                    rerollBox.classList.remove('hidden');
-                } else {
-                    alert("No encontramos suficientes películas con esos filtros tan específicos en esta página. ¡Prueba el botón de Reroll de nuevo!");
-                    rerollBox.classList.remove('hidden'); // Mostramos reroll igual para que pueda reintentar
+                
+                // Mezclar resultados
+                let movies = data.results.sort(() => 0.5 - Math.random());
+                
+                // FILTRO FIREBASE
+                let finalMovies = [];
+                for (let movie of movies) {
+                    if (finalMovies.length >= 4) break; // Límite de 4 películas
+                    
+                    let isWatched = false;
+                    if (currentUser) {
+                        const docRef = doc(db, "users", currentUser.uid, "watched", movie.id.toString());
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) isWatched = true;
+                    }
+                    if (!isWatched) finalMovies.push(movie);
                 }
+
+                if (finalMovies.length > 0) {
+                    await renderMovies(finalMovies, apiKey);
+                } else {
+                    alert("Parece que ya viste todas las películas de esta página. ¡Volvé a intentar!");
+                }
+                document.getElementById('rerollBox').classList.remove('hidden');
+
             } catch (error) {
                 console.error(error);
-                alert("Error al conectar con TMDB. Verifica tu internet o API Key.");
+                alert("Error al conectar. Revisá la consola.");
             } finally {
-                loader.style.display = 'none';
-                btn.disabled = false;
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('searchBtn').disabled = false;
+                document.getElementById('rerollBtn').disabled = false;
             }
         }
 
-        function renderMovies(movies) {
+        // --- RENDERIZAR RESULTADOS ---
+        async function renderMovies(movies, apiKey) {
             const grid = document.getElementById('resultsGrid');
-            let htmlContent = '';
             
-            movies.forEach(movie => {
-                const posterUrl = movie.poster_path 
-                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` 
-                    : "https://via.placeholder.com/500x750?text=No+Poster&bg=2a2a2a&textColor=ffffff";
-                
-                const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
-                const rating = movie.vote_average.toFixed(1);
-                const desc = movie.overview || "Sin descripción disponible en español.";
-                const trailerLink = `https://www.youtube.com/results?search_query=trailer+español+${encodeURIComponent(movie.title)}`;
+            for (let movie of movies) {
+                // Buscar Streaming (AR)
+                let providersHTML = '<span class="no-providers">No disponible en streaming</span>';
+                try {
+                    const provUrl = `https://api.themoviedb.org/3/movie/${movie.id}/watch/providers?api_key=${apiKey}`;
+                    const provRes = await fetch(provUrl);
+                    const provData = await provRes.json();
+                    
+                    if (provData.results && provData.results.AR && provData.results.AR.flatrate) {
+                        providersHTML = '';
+                        provData.results.AR.flatrate.slice(0, 4).forEach(platform => {
+                            providersHTML += `<img src="https://image.tmdb.org/t/p/w45${platform.logo_path}" class="provider-icon" title="${platform.provider_name}" alt="${platform.provider_name}">`;
+                        });
+                    }
+                } catch (e) { console.error("Error cargando providers", e); }
 
-                htmlContent += `
-                    <div class="result-card">
-                        <div class="poster-container">
-                            <img src="${posterUrl}" alt="Poster de ${movie.title}">
+                // Construir HTML
+                const posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster";
+                const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
+                const trailerLink = `https://www.youtube.com/results?search_query=trailer+español+${encodeURIComponent(movie.title)}`;
+                
+                const cardDiv = document.createElement('div');
+                cardDiv.className = "result-card";
+                cardDiv.id = `movie-card-${movie.id}`;
+                
+                cardDiv.innerHTML = `
+                    <div class="poster-container"><img src="${posterUrl}"></div>
+                    <div class="info-container">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-meta">
+                            <span class="badge">${year}</span>
+                            <span class="badge rating-badge">★ ${movie.vote_average.toFixed(1)}</span>
                         </div>
-                        <div class="info-container">
-                            <div class="movie-title">${movie.title}</div>
-                            <div class="movie-meta">
-                                <span class="badge">${year}</span>
-                                <span class="badge rating-badge">★ ${rating}</span>
-                            </div>
-                            <div class="movie-desc">${desc}</div>
-                            <a href="${trailerLink}" target="_blank" class="trailer-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                Ver Tráiler
-                            </a>
+                        <div class="providers-container">${providersHTML}</div>
+                        <div class="movie-desc">${movie.overview || "Sin descripción."}</div>
+                        <div class="card-actions">
+                            <a href="${trailerLink}" target="_blank" class="trailer-btn">▶ Tráiler</a>
+                            <button class="watched-btn" title="Marcar como vista y ocultar" data-id="${movie.id}" data-title="${movie.title}">👁️ Ya la vi</button>
                         </div>
                     </div>
                 `;
+                grid.appendChild(cardDiv);
+            }
+
+            // Eventos de botones "Ya la vi"
+            document.querySelectorAll('.watched-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (!currentUser) return alert("Iniciá sesión con Google arriba para usar esta función.");
+                    
+                    const movieId = e.currentTarget.getAttribute('data-id');
+                    const movieTitle = e.currentTarget.getAttribute('data-title');
+                    const card = document.getElementById(`movie-card-${movieId}`);
+                    
+                    card.style.opacity = '0.5';
+                    card.style.pointerEvents = 'none';
+                    e.currentTarget.innerText = "⏳ Guardando...";
+
+                    try {
+                        await setDoc(doc(db, "users", currentUser.uid, "watched", movieId), {
+                            title: movieTitle,
+                            addedAt: new Date()
+                        });
+                        card.remove();
+                    } catch (error) {
+                        console.error("Error guardando:", error);
+                        alert("Hubo un error al guardar.");
+                        card.style.opacity = '1';
+                        card.style.pointerEvents = 'auto';
+                        e.currentTarget.innerText = "👁️ Ya la vi";
+                    }
+                });
             });
-            
-            grid.innerHTML = htmlContent;
         }
+
+        // Asignar eventos de los botones principales
+        document.getElementById('searchBtn').addEventListener('click', fetchMovies);
+        document.getElementById('rerollBtn').addEventListener('click', fetchMovies);
     </script>
 </body>
 </html>
