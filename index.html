@@ -64,18 +64,24 @@
         .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
         
         .movie-credits { font-size: 0.8rem; color: #888; margin-bottom: 10px; line-height: 1.4; border-top: 1px solid #333; padding-top: 10px; }
-        .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 60px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        
+        /* MODIFICACIÓN: Descripción mucho más alta */
+        .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 115px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
         
         .providers-container { display: flex; gap: 8px; margin-bottom: 10px; min-height: 35px; align-items: center; }
         .provider-icon { width: 35px; height: 35px; border-radius: 8px; }
         .no-providers { font-size: 0.8rem; color: #777; font-style: italic; }
 
-        .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-        .action-btn { background-color: var(--bg-inputs); color: white; text-align: center; padding: 10px; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.85rem; flex-grow: 1; font-weight: bold; transition: 0.2s; cursor: pointer; border: 1px solid transparent; }
+        /* MODIFICACIÓN: Botones forzados a una fila */
+        .card-actions { display: flex; gap: 5px; flex-wrap: nowrap; align-items: stretch; }
+        .action-btn { background-color: var(--bg-inputs); color: white; text-align: center; padding: 10px 4px; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.85rem; font-weight: bold; transition: 0.2s; cursor: pointer; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .action-btn:hover { background-color: #fff; color: #000; }
-        .save-btn { background-color: rgba(255, 255, 255, 0.1); border: 1px solid #555; }
+        
+        /* Ajuste de flex para que encajen perfecto */
+        .trailer-btn { flex: 2; }
+        .save-btn { flex: 1; min-width: 40px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid #555; }
         .save-btn:hover { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
-        .watched-btn { background-color: transparent; border: 1px solid #555; color: #aaa; }
+        .watched-btn { flex: 2; background-color: transparent; border: 1px solid #555; color: #aaa; }
         .watched-btn:hover { background-color: #333; color: white; }
 
         .reroll-container { margin-top: 40px; margin-bottom: 60px; width: 100%; max-width: 400px; }
@@ -129,15 +135,20 @@
                 <option value="28">💥 Acción y Adrenalina</option>
                 <option value="16">🎨 Animación</option>
                 <option value="12">✈️ Aventuras Épicas</option>
-                <option value="878">💻 Cyberpunk & Sci-Fi</option>
+                <option value="10752">⚔️ Bélicas y Guerra</option>
                 <option value="35">😂 Comedia</option>
                 <option value="80,9648">🕵️ Crimen y Misterio</option>
                 <option value="99">🎥 Documentales</option>
+                <option value="18">🎭 Drama Profundo</option>
+                <option value="10751">👨‍👩‍👧‍👦 Para ver en Familia</option>
                 <option value="14">🧙‍♂️ Fantasía y Magia</option>
+                <option value="36">📜 Históricas</option>
                 <option value="18,53">🏛️ Intriga, Poder y Thrillers</option>
                 <option value="10402">🎵 Música y Musicales</option>
                 <option value="10749">❤️ Romance</option>
+                <option value="878">💻 Sci-Fi & Cyberpunk</option>
                 <option value="27">👻 Terror Moderno</option>
+                <option value="37">🤠 Western</option>
             </select>
             <select id="timeFilter">
                 <option value="cualquiera" selected>⏱️ Sin límite</option>
@@ -151,7 +162,7 @@
         <div class="results-grid" id="resultsGrid"></div>
 
         <div class="reroll-container hidden" id="rerollBox">
-            <button id="rerollBtn" class="btn-secondary">🎲 Reroll (Probar otra vez)</button>
+            <button id="rerollBtn" class="btn-secondary">➕ Cargar más películas</button>
         </div>
     </div>
 
@@ -214,33 +225,41 @@
             }
         });
 
-        function renderSkeletons() {
+        // MODIFICACIÓN: Los skeletons ahora se añaden al final sin borrar lo anterior si es un "Load More"
+        function renderSkeletons(isLoadMore) {
             const grid = document.getElementById('resultsGrid');
-            grid.innerHTML = '';
+            if (!isLoadMore) grid.innerHTML = '';
+            
+            let skeletonHTML = '';
             for (let i = 0; i < 5; i++) {
-                grid.innerHTML += `
-                    <div class="result-card" style="border-color: #333;">
+                skeletonHTML += `
+                    <div class="result-card skeleton-card" style="border-color: #333;">
                         <div class="poster-container skeleton"></div>
                         <div class="info-container">
                             <div class="skeleton" style="width: 70%; height: 22px; margin-bottom: 12px; border-radius: 4px;"></div>
                             <div class="skeleton" style="width: 40%; height: 16px; margin-bottom: 15px; border-radius: 4px;"></div>
-                            <div class="skeleton" style="width: 100%; height: 60px; margin-bottom: 15px; border-radius: 4px; flex-grow: 1;"></div>
-                            <div style="display: flex; gap: 8px; margin-top: auto;">
-                                <div class="skeleton" style="width: 100%; height: 38px; border-radius: 8px;"></div>
-                                <div class="skeleton" style="width: 100%; height: 38px; border-radius: 8px;"></div>
+                            <div class="skeleton" style="width: 100%; height: 110px; margin-bottom: 15px; border-radius: 4px; flex-grow: 1;"></div>
+                            <div style="display: flex; gap: 5px; margin-top: auto;">
+                                <div class="skeleton" style="flex: 2; height: 38px; border-radius: 8px;"></div>
+                                <div class="skeleton" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                                <div class="skeleton" style="flex: 2; height: 38px; border-radius: 8px;"></div>
                             </div>
                         </div>
                     </div>
                 `;
             }
+            grid.insertAdjacentHTML('beforeend', skeletonHTML);
         }
 
-        async function fetchMovies() {
+        // MODIFICACIÓN: Lógica de Load More añadida
+        async function fetchMovies(isLoadMore = false) {
             document.getElementById('searchBtn').disabled = true;
             document.getElementById('rerollBtn').disabled = true;
-            document.getElementById('rerollBox').classList.add('hidden');
+            if (!isLoadMore) {
+                document.getElementById('rerollBox').classList.add('hidden');
+            }
             
-            renderSkeletons();
+            renderSkeletons(isLoadMore);
 
             const genres = document.getElementById('themeFilter').value;
             const timeFilter = document.getElementById('timeFilter').value;
@@ -248,14 +267,9 @@
 
             let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/movie?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
             if (genres) url += `&with_genres=${genres}`;
-            
-            if (timeFilter === 'corta') {
-                url += `&with_runtime.lte=80`;
-            } else if (timeFilter === 'normal') {
-                url += `&with_runtime.gte=81&with_runtime.lte=109`; 
-            } else if (timeFilter === 'larga') {
-                url += `&with_runtime.gte=110`; 
-            }
+            if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
+            else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=109`; 
+            else if (timeFilter === 'larga') url += `&with_runtime.gte=110`; 
 
             try {
                 const response = await fetch(url);
@@ -277,16 +291,22 @@
                     if (!isFilteredOut) finalMovies.push(movie);
                 }
 
+                // Borramos los skeletons antes de inyectar las cartas reales
+                document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
+
                 if (finalMovies.length > 0) {
                     await renderMovies(finalMovies);
                 } else {
-                    document.getElementById('resultsGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #aaa;">Ya tenés registradas todas las películas de esta página. ¡Volvé a intentar!</div>';
+                    if (!isLoadMore) {
+                        document.getElementById('resultsGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #aaa;">Ya tenés registradas todas las películas de esta página. ¡Cargá más!</div>';
+                    }
                 }
                 document.getElementById('rerollBox').classList.remove('hidden');
 
             } catch (error) {
                 console.error(error);
                 alert("Error al conectar con TMDB. Revisá la consola.");
+                document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
             } finally {
                 document.getElementById('searchBtn').disabled = false;
                 document.getElementById('rerollBtn').disabled = false;
@@ -295,7 +315,6 @@
 
         async function renderMovies(movies) {
             const grid = document.getElementById('resultsGrid');
-            grid.innerHTML = ''; 
             
             for (let movie of movies) {
                 let providersHTML = '<span class="no-providers">No disponible en streaming</span>';
@@ -303,7 +322,6 @@
                 let mainCast = "No disponible";
 
                 try {
-                    // AQUÍ ESTÁ EL ARREGLO PARA QUE EL WORKER ARME BIEN LA URL (?language=es-AR)
                     const [provRes, detailsRes] = await Promise.all([
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers?language=es-AR`),
                         fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}?language=es-MX&append_to_response=credits`)
@@ -348,7 +366,7 @@
                         <div class="movie-desc">${movie.overview || "Sin descripción disponible."}</div>
                         
                         <div class="card-actions">
-                            <a href="${trailerLink}" target="_blank" class="action-btn">▶ Tráiler</a>
+                            <a href="${trailerLink}" target="_blank" class="action-btn trailer-btn">▶ Tráiler</a>
                             <button class="action-btn save-btn" title="Guardar para ver después" data-id="${movie.id}" data-title="${movie.title}">⏳</button>
                             <button class="action-btn watched-btn" title="Marcar como vista" data-id="${movie.id}" data-title="${movie.title}">👁️ Ya la vi</button>
                         </div>
@@ -361,6 +379,10 @@
         }
 
         function assignCardEvents() {
+            document.querySelectorAll('.save-btn').forEach(btn => {
+                // Removemos el evento anterior para evitar que se dupliquen al cargar más
+                btn.replaceWith(btn.cloneNode(true));
+            });
             document.querySelectorAll('.save-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if (!currentUser) return;
@@ -387,6 +409,9 @@
                 });
             });
 
+            document.querySelectorAll('.watched-btn').forEach(btn => {
+                btn.replaceWith(btn.cloneNode(true));
+            });
             document.querySelectorAll('.watched-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if (!currentUser) return;
@@ -493,8 +518,9 @@
             }
         }
 
-        document.getElementById('searchBtn').addEventListener('click', fetchMovies);
-        document.getElementById('rerollBtn').addEventListener('click', fetchMovies);
+        // Modificamos el funcionamiento de los botones principales
+        document.getElementById('searchBtn').addEventListener('click', () => fetchMovies(false));
+        document.getElementById('rerollBtn').addEventListener('click', () => fetchMovies(true));
     </script>
 </body>
 </html>
