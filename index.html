@@ -12,13 +12,9 @@
             --accent-color: #ff3d47; --accent-hover: #ff6b72;
             --radius-lg: 16px; --radius-sm: 8px;
         }
-        body {
-            font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary);
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
         
-        /* HEADER */
-        .header { width: 100%; max-width: 1280px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 10px 20px; box-sizing: border-box; }
+        .header { width: 100%; max-width: 1280px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 20px; box-sizing: border-box; }
         .header h1 { font-weight: 900; letter-spacing: -1px; margin: 0; font-size: 2rem; background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .user-info { display: flex; align-items: center; gap: 15px; }
         .profile-btn { display: flex; align-items: center; gap: 10px; background: var(--bg-inputs); padding: 6px 15px; border-radius: 30px; border: 1px solid #333; cursor: pointer; transition: 0.2s; }
@@ -28,7 +24,6 @@
         .btn-logout { background: transparent; color: var(--text-secondary); border: 1px solid #444; padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
         .btn-logout:hover { background: #ff3d47; color: #fff; border-color: #ff3d47; }
 
-        /* PANTALLA DE BIENVENIDA */
         .welcome-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-top: 10vh; max-width: 500px; }
         .welcome-screen h2 { font-size: 2.5rem; margin-bottom: 10px; }
         .welcome-screen p { color: var(--text-secondary); font-size: 1.1rem; line-height: 1.6; margin-bottom: 40px; }
@@ -37,8 +32,13 @@
 
         .hidden { display: none !important; }
 
-        /* APP PRINCIPAL */
         .app-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        
+        /* SWITCH PELÍCULAS/SERIES */
+        .type-toggle { display: flex; background: var(--bg-inputs); border-radius: 30px; padding: 5px; margin-bottom: 25px; border: 1px solid #333; }
+        .type-btn { background: transparent; color: var(--text-secondary); border: none; padding: 10px 25px; border-radius: 25px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .type-btn.active { background: #444; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #555; }
+
         .controls { background-color: var(--bg-card); padding: 25px; border-radius: var(--radius-lg); display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; width: 100%; max-width: 900px; border: 1px solid #2a2a2a; }
         select, button { padding: 12px 20px; font-size: 15px; border-radius: var(--radius-sm); border: none; outline: none; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; }
         select { background-color: var(--bg-inputs); color: var(--text-primary); flex-grow: 1; }
@@ -51,11 +51,10 @@
         .result-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
         .grayed-out { opacity: 0.4; filter: grayscale(100%); pointer-events: none; transform: scale(0.98); }
         
-        /* SKELETON LOADERS */
         .skeleton { animation: shimmer 1.5s infinite linear; background: linear-gradient(to right, #252525 4%, #333 25%, #252525 36%); background-size: 1000px 100%; }
         @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
         
-        .poster-container { width: 100%; height: 330px; background-color: #000; }
+        .poster-container { width: 100%; height: 330px; background-color: #000; position: relative; }
         .poster-container img { width: 100%; height: 100%; object-fit: cover; }
         .info-container { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
         .movie-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; line-height: 1.2; }
@@ -64,23 +63,18 @@
         .rating-badge { color: #ffd700; background: rgba(255, 215, 0, 0.1); }
         
         .movie-credits { font-size: 0.8rem; color: #888; margin-bottom: 10px; line-height: 1.4; border-top: 1px solid #333; padding-top: 10px; }
-        
-        /* DESCRIPCIÓN MÁS LARGA GRACIAS AL AHORRO DE BOTONES */
         .movie-desc { font-size: 0.85rem; line-height: 1.5; color: #ccc; flex-grow: 1; margin-bottom: 15px; height: 130px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; scrollbar-color: #444 transparent; }
         
         .providers-container { display: flex; gap: 8px; margin-bottom: 10px; min-height: 35px; align-items: center; }
         .provider-icon { width: 35px; height: 35px; border-radius: 8px; }
         .no-providers { font-size: 0.8rem; color: #777; font-style: italic; }
 
-        /* BOTONES DEL MISMO TAMAÑO Y EN UNA SOLA LÍNEA */
         .card-actions { display: flex; gap: 8px; flex-wrap: nowrap; align-items: stretch; }
         .action-btn { background-color: var(--bg-inputs); color: white; border-radius: var(--radius-sm); text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: 0.2s; cursor: pointer; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .action-btn:hover { background-color: #fff; color: #000; }
         
-        /* Flexbox distribuido perfecto */
         .trailer-btn { flex-grow: 1; padding: 10px; }
-        .save-btn, .watched-btn { flex: 0 0 50px; font-size: 1.2rem; padding: 0; } /* 50px de ancho exacto para ambos */
-        
+        .save-btn, .watched-btn { flex: 0 0 50px; font-size: 1.2rem; padding: 0; } 
         .save-btn { background-color: rgba(255, 255, 255, 0.1); border: 1px solid #555; }
         .save-btn:hover { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
         .watched-btn { background-color: transparent; border: 1px solid #555; color: #aaa; }
@@ -90,7 +84,6 @@
         .btn-secondary { background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); width: 100%; padding: 15px; }
         .btn-secondary:hover { background: var(--accent-color); color: white; }
 
-        /* MODAL DE PERFIL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 1; transition: 0.3s; }
         .modal-overlay.hidden { opacity: 0; pointer-events: none; }
         .modal-content { background: var(--bg-card); width: 90%; max-width: 500px; border-radius: var(--radius-lg); border: 1px solid #333; overflow: hidden; display: flex; flex-direction: column; max-height: 80vh; }
@@ -123,7 +116,7 @@
 
     <div id="welcomeScreen" class="welcome-screen">
         <h2>Dejá de scrollear. Empezá a ver.</h2>
-        <p>Iniciá sesión para descubrir películas, guardarlas en tu lista o descartar las que ya viste.</p>
+        <p>Iniciá sesión para descubrir películas y series, guardarlas en tu lista o descartar las que ya viste.</p>
         <button class="big-login-btn" id="loginBtn">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Entrar con Google
@@ -131,43 +124,22 @@
     </div>
 
     <div id="mainApp" class="app-container hidden">
+        
+        <div class="type-toggle">
+            <button class="type-btn active" id="modeMovieBtn">🎬 Películas</button>
+            <button class="type-btn" id="modeTvBtn">📺 Series</button>
+        </div>
+
         <div class="controls">
-            <select id="themeFilter">
-                <option value="">🎲 Sorpréndeme (Todas)</option>
-                <option value="28">💥 Acción</option>
-                <option value="16">🎨 Animación</option>
-                <option value="12">🗺️ Aventura</option>
-                <option value="10752">⚔️ Bélico</option>
-                <option value="kw-3205">✍️ Biográfico</option>
-                <option value="878">👽 Ciencia ficción</option>
-                <option value="35">😂 Comedia</option>
-                <option value="80">🕵️ Crimen/Policial</option>
-                <option value="kw-4344">🏆 Deportes</option>
-                <option value="99">🎥 Documental</option>
-                <option value="18">🎭 Drama</option>
-                <option value="10751">👨‍👩‍👧‍👦 Familiar</option>
-                <option value="14">🧙‍♂️ Fantasía</option>
-                <option value="36">📜 Histórico</option>
-                <option value="9648">🔍 Misterio</option>
-                <option value="10402">🎵 Musical</option>
-                <option value="10749">❤️ Romance</option>
-                <option value="53">🔪 Suspenso/Thriller</option>
-                <option value="27">👻 Terror</option>
-                <option value="37">🤠 Western</option>
-            </select>
-            <select id="timeFilter">
-                <option value="cualquiera" selected>⏱️ Sin límite</option>
-                <option value="corta">⚡ Corta (≤ 1:20h)</option>
-                <option value="normal">⏳ Normal (1:20h - 1:49h)</option>
-                <option value="larga">🍿 Larga (≥ 1:50h)</option> 
-            </select>
-            <button id="searchBtn" class="btn-primary">Buscar 5 Películas</button>
+            <select id="themeFilter"></select>
+            <select id="timeFilter"></select>
+            <button id="searchBtn" class="btn-primary">Buscar 5 Resultados</button>
         </div>
 
         <div class="results-grid" id="resultsGrid"></div>
 
         <div class="reroll-container hidden" id="rerollBox">
-            <button id="rerollBtn" class="btn-secondary">➕ Cargar más películas</button>
+            <button id="rerollBtn" class="btn-secondary">➕ Cargar más</button>
         </div>
     </div>
 
@@ -207,8 +179,92 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
-        let currentModalTab = 'watchlist'; 
+        let currentMode = 'movie'; // 'movie' o 'tv'
 
+        // --- DICCIONARIOS DINÁMICOS PARA FILTROS ---
+        const genresMovie = `
+            <option value="">🎲 Sorpréndeme (Todas)</option>
+            <option value="28">💥 Acción</option>
+            <option value="16">🎨 Animación</option>
+            <option value="12">🗺️ Aventura</option>
+            <option value="10752">⚔️ Bélico</option>
+            <option value="kw-3205">✍️ Biográfico</option>
+            <option value="878">👽 Ciencia ficción</option>
+            <option value="35">😂 Comedia</option>
+            <option value="80">🕵️ Crimen/Policial</option>
+            <option value="kw-4344">🏆 Deportes</option>
+            <option value="99">🎥 Documental</option>
+            <option value="18">🎭 Drama</option>
+            <option value="10751">👨‍👩‍👧‍👦 Familiar</option>
+            <option value="14">🧙‍♂️ Fantasía</option>
+            <option value="36">📜 Histórico</option>
+            <option value="9648">🔍 Misterio</option>
+            <option value="10402">🎵 Musical</option>
+            <option value="10749">❤️ Romance</option>
+            <option value="53">🔪 Suspenso/Thriller</option>
+            <option value="27">👻 Terror</option>
+            <option value="37">🤠 Western</option>
+        `;
+
+        const genresTv = `
+            <option value="">🎲 Sorpréndeme (Todas)</option>
+            <option value="10759">💥 Acción y Aventura</option>
+            <option value="16">🎨 Animación</option>
+            <option value="35">😂 Comedia</option>
+            <option value="80">🕵️ Crimen/Policial</option>
+            <option value="99">🎥 Documental</option>
+            <option value="18">🎭 Drama</option>
+            <option value="10751">👨‍👩‍👧‍👦 Familiar</option>
+            <option value="10762">🧸 Infantil</option>
+            <option value="9648">🔍 Misterio</option>
+            <option value="10764">📺 Reality Show</option>
+            <option value="10765">👽 Sci-Fi y Fantasía</option>
+            <option value="10766">💔 Telenovelas</option>
+            <option value="10768">⚔️ Política y Guerra</option>
+            <option value="37">🤠 Western</option>
+        `;
+
+        const timeMovie = `
+            <option value="cualquiera" selected>⏱️ Sin límite</option>
+            <option value="corta">⚡ Corta (≤ 1:20h)</option>
+            <option value="normal">⏳ Normal (1:20h - 1:49h)</option>
+            <option value="larga">🍿 Larga (≥ 1:50h)</option>
+        `;
+
+        const timeTv = `
+            <option value="cualquiera" selected>⏱️ Capítulos sin límite</option>
+            <option value="corta">⚡ Cortos (≤ 30m)</option>
+            <option value="normal">⏳ Medios (31m - 55m)</option>
+            <option value="larga">🍿 Largos (≥ 56m)</option>
+        `;
+
+        function updateUIForMode() {
+            const themeFilter = document.getElementById('themeFilter');
+            const timeFilter = document.getElementById('timeFilter');
+            
+            if(currentMode === 'movie') {
+                themeFilter.innerHTML = genresMovie;
+                timeFilter.innerHTML = timeMovie;
+                document.getElementById('modeMovieBtn').classList.add('active');
+                document.getElementById('modeTvBtn').classList.remove('active');
+            } else {
+                themeFilter.innerHTML = genresTv;
+                timeFilter.innerHTML = timeTv;
+                document.getElementById('modeTvBtn').classList.add('active');
+                document.getElementById('modeMovieBtn').classList.remove('active');
+            }
+            document.getElementById('resultsGrid').innerHTML = '';
+            document.getElementById('rerollBox').classList.add('hidden');
+        }
+
+        // Eventos del Switcher
+        document.getElementById('modeMovieBtn').addEventListener('click', () => { currentMode = 'movie'; updateUIForMode(); });
+        document.getElementById('modeTvBtn').addEventListener('click', () => { currentMode = 'tv'; updateUIForMode(); });
+
+        // Iniciar UI
+        updateUIForMode();
+
+        // --- AUTENTICACIÓN ---
         document.getElementById('loginBtn').addEventListener('click', () => signInWithPopup(auth, provider));
         document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
@@ -225,8 +281,6 @@
                 document.getElementById('welcomeScreen').classList.remove('hidden');
                 document.getElementById('loggedInView').classList.add('hidden');
                 document.getElementById('mainApp').classList.add('hidden');
-                document.getElementById('resultsGrid').innerHTML = '';
-                document.getElementById('rerollBox').classList.add('hidden');
             }
         });
 
@@ -258,9 +312,7 @@
         async function fetchMovies(isLoadMore = false) {
             document.getElementById('searchBtn').disabled = true;
             document.getElementById('rerollBtn').disabled = true;
-            if (!isLoadMore) {
-                document.getElementById('rerollBox').classList.add('hidden');
-            }
+            if (!isLoadMore) document.getElementById('rerollBox').classList.add('hidden');
             
             renderSkeletons(isLoadMore);
 
@@ -268,55 +320,59 @@
             const timeFilter = document.getElementById('timeFilter').value;
             const randomPage = Math.floor(Math.random() * 10) + 1;
 
-            let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/movie?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
+            let url = `https://cineflow-proxy.jose-isnap.workers.dev/3/discover/${currentMode}?language=es-MX&sort_by=popularity.desc&include_adult=false&page=${randomPage}&vote_count.gte=100&watch_region=AR`; 
             
-            // TRUCO PARA ACEPTAR PALABRAS CLAVE (Biográfico, Deportes) o GÉNEROS NORMALES
             if (genres) {
-                if (genres.startsWith('kw-')) {
-                    url += `&with_keywords=${genres.replace('kw-', '')}`;
-                } else {
-                    url += `&with_genres=${genres}`;
-                }
+                if (genres.startsWith('kw-')) url += `&with_keywords=${genres.replace('kw-', '')}`;
+                else url += `&with_genres=${genres}`;
             }
 
-            if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
-            else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=109`; 
-            else if (timeFilter === 'larga') url += `&with_runtime.gte=110`; 
+            // Lógica de Tiempos adaptada según modo
+            if (currentMode === 'movie') {
+                if (timeFilter === 'corta') url += `&with_runtime.lte=80`;
+                else if (timeFilter === 'normal') url += `&with_runtime.gte=81&with_runtime.lte=109`; 
+                else if (timeFilter === 'larga') url += `&with_runtime.gte=110`; 
+            } else { // Series (duración de capítulos)
+                if (timeFilter === 'corta') url += `&with_runtime.lte=30`;
+                else if (timeFilter === 'normal') url += `&with_runtime.gte=31&with_runtime.lte=55`; 
+                else if (timeFilter === 'larga') url += `&with_runtime.gte=56`; 
+            }
 
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                let movies = data.results.sort(() => 0.5 - Math.random());
+                let results = data.results.sort(() => 0.5 - Math.random());
+                let finalResults = [];
                 
-                let finalMovies = [];
-                for (let movie of movies) {
-                    if (finalMovies.length >= 5) break; 
+                for (let item of results) {
+                    if (finalResults.length >= 5) break; 
                     
                     let isFilteredOut = false;
+                    let dbId = `${currentMode}_${item.id}`; // Ej: movie_123 o tv_123
+
                     if (currentUser) {
-                        const docWatched = await getDoc(doc(db, "users", currentUser.uid, "watched", movie.id.toString()));
-                        const docWatchlist = await getDoc(doc(db, "users", currentUser.uid, "watchlist", movie.id.toString()));
-                        
+                        const docWatched = await getDoc(doc(db, "users", currentUser.uid, "watched", dbId));
+                        const docWatchlist = await getDoc(doc(db, "users", currentUser.uid, "watchlist", dbId));
                         if (docWatched.exists() || docWatchlist.exists()) isFilteredOut = true;
                     }
-                    if (!isFilteredOut) finalMovies.push(movie);
+                    if (!isFilteredOut) finalResults.push(item);
                 }
 
                 document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
 
-                if (finalMovies.length > 0) {
-                    await renderMovies(finalMovies);
+                if (finalResults.length > 0) {
+                    await renderItems(finalResults);
                 } else {
                     if (!isLoadMore) {
-                        document.getElementById('resultsGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #aaa;">Ya tenés registradas todas las películas de esta página. ¡Cargá más!</div>';
+                        document.getElementById('resultsGrid').innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #aaa;">Ya tenés registrados todos los resultados de esta página. ¡Cargá más!</div>';
                     }
                 }
                 document.getElementById('rerollBox').classList.remove('hidden');
 
             } catch (error) {
                 console.error(error);
-                alert("Error al conectar con TMDB. Revisá la consola.");
+                alert("Error al conectar con TMDB.");
                 document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
             } finally {
                 document.getElementById('searchBtn').disabled = false;
@@ -324,18 +380,18 @@
             }
         }
 
-        async function renderMovies(movies) {
+        async function renderItems(items) {
             const grid = document.getElementById('resultsGrid');
             
-            for (let movie of movies) {
+            for (let item of items) {
                 let providersHTML = '<span class="no-providers">No disponible en streaming</span>';
                 let director = "Desconocido";
                 let mainCast = "No disponible";
 
                 try {
                     const [provRes, detailsRes] = await Promise.all([
-                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}/watch/providers?language=es-AR`),
-                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/movie/${movie.id}?language=es-MX&append_to_response=credits`)
+                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/${currentMode}/${item.id}/watch/providers?language=es-AR`),
+                        fetch(`https://cineflow-proxy.jose-isnap.workers.dev/3/${currentMode}/${item.id}?language=es-MX&append_to_response=credits`)
                     ]);
 
                     const provData = await provRes.json();
@@ -348,38 +404,51 @@
                         });
                     }
 
-                    if (detailsData.credits) {
+                    if (currentMode === 'movie' && detailsData.credits) {
                         const dirObj = detailsData.credits.crew.find(c => c.job === 'Director');
                         if (dirObj) director = dirObj.name;
+                    } else if (currentMode === 'tv' && detailsData.created_by) {
+                        // Series: mostrar Creadores
+                        if (detailsData.created_by.length > 0) director = detailsData.created_by.map(c => c.name).join(', ');
+                    }
+
+                    if (detailsData.credits && detailsData.credits.cast) {
                         mainCast = detailsData.credits.cast.slice(0, 3).map(c => c.name).join(', ') || mainCast;
                     }
 
                 } catch (e) { console.error("Error extra data", e); }
 
-                const posterUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster";
-                const year = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
-                const trailerLink = `https://www.youtube.com/results?search_query=trailer+español+latino+${encodeURIComponent(movie.title)}`;
+                const title = item.title || item.name;
+                const releaseDate = item.release_date || item.first_air_date || '';
+                const year = releaseDate ? releaseDate.split('-')[0] : 'N/A';
+                const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : "https://via.placeholder.com/500x750?text=No+Poster";
                 
+                // Búsqueda de tráiler ajustada para series
+                const trailerQuery = currentMode === 'movie' ? `trailer español latino pelicula ${title}` : `trailer español latino serie ${title}`;
+                const trailerLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(trailerQuery)}`;
+                const dbId = `${currentMode}_${item.id}`;
+                const dirLabel = currentMode === 'movie' ? 'Dir' : 'Crea'; // Creador vs Director
+
                 const cardDiv = document.createElement('div');
                 cardDiv.className = "result-card";
-                cardDiv.id = `movie-card-${movie.id}`;
+                cardDiv.id = `card-${dbId}`;
                 
                 cardDiv.innerHTML = `
                     <div class="poster-container"><img src="${posterUrl}"></div>
                     <div class="info-container">
-                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-title">${title}</div>
                         <div class="movie-meta">
                             <span class="badge">${year}</span>
-                            <span class="badge rating-badge">★ ${movie.vote_average.toFixed(1)}</span>
+                            <span class="badge rating-badge">★ ${item.vote_average.toFixed(1)}</span>
                         </div>
                         <div class="providers-container">${providersHTML}</div>
-                        <div class="movie-credits">🎬 <b>Dir:</b> ${director} <br> 👥 <b>Con:</b> ${mainCast}</div>
-                        <div class="movie-desc">${movie.overview || "Sin descripción disponible."}</div>
+                        <div class="movie-credits">🎬 <b>${dirLabel}:</b> ${director} <br> 👥 <b>Con:</b> ${mainCast}</div>
+                        <div class="movie-desc">${item.overview || "Sin descripción disponible."}</div>
                         
                         <div class="card-actions">
                             <a href="${trailerLink}" target="_blank" class="action-btn trailer-btn">▶ Tráiler</a>
-                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${movie.id}" data-title="${movie.title}">⏳</button>
-                            <button class="action-btn watched-btn" title="Marcar como vista" data-id="${movie.id}" data-title="${movie.title}">👁️</button>
+                            <button class="action-btn save-btn" title="Guardar para ver después" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">⏳</button>
+                            <button class="action-btn watched-btn" title="Marcar como vista" data-id="${dbId}" data-title="${title}" data-type="${currentMode}">👁️</button>
                         </div>
                     </div>
                 `;
@@ -390,15 +459,14 @@
         }
 
         function assignCardEvents() {
-            document.querySelectorAll('.save-btn').forEach(btn => {
-                btn.replaceWith(btn.cloneNode(true));
-            });
+            document.querySelectorAll('.save-btn').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
             document.querySelectorAll('.save-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if (!currentUser) return;
-                    const movieId = e.currentTarget.getAttribute('data-id');
-                    const movieTitle = e.currentTarget.getAttribute('data-title');
-                    const card = document.getElementById(`movie-card-${movieId}`);
+                    const dbId = e.currentTarget.getAttribute('data-id');
+                    const title = e.currentTarget.getAttribute('data-title');
+                    const type = e.currentTarget.getAttribute('data-type');
+                    const card = document.getElementById(`card-${dbId}`);
                     const button = e.currentTarget;
                     
                     card.style.opacity = '0.8';
@@ -406,12 +474,11 @@
                     button.disabled = true;
 
                     try {
-                        await setDoc(doc(db, "users", currentUser.uid, "watchlist", movieId), { title: movieTitle, addedAt: new Date() });
+                        await setDoc(doc(db, "users", currentUser.uid, "watchlist", dbId), { title: title, type: type, addedAt: new Date() });
                         card.style.opacity = '';
                         card.classList.add('grayed-out');
                         button.innerText = "✅";
                     } catch (error) {
-                        console.error("Error:", error);
                         card.style.opacity = '';
                         button.innerText = "⏳";
                         button.disabled = false;
@@ -419,15 +486,14 @@
                 });
             });
 
-            document.querySelectorAll('.watched-btn').forEach(btn => {
-                btn.replaceWith(btn.cloneNode(true));
-            });
+            document.querySelectorAll('.watched-btn').forEach(btn => btn.replaceWith(btn.cloneNode(true)));
             document.querySelectorAll('.watched-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     if (!currentUser) return;
-                    const movieId = e.currentTarget.getAttribute('data-id');
-                    const movieTitle = e.currentTarget.getAttribute('data-title');
-                    const card = document.getElementById(`movie-card-${movieId}`);
+                    const dbId = e.currentTarget.getAttribute('data-id');
+                    const title = e.currentTarget.getAttribute('data-title');
+                    const type = e.currentTarget.getAttribute('data-type');
+                    const card = document.getElementById(`card-${dbId}`);
                     const button = e.currentTarget;
                     
                     card.style.opacity = '0.8';
@@ -435,12 +501,11 @@
                     button.disabled = true;
 
                     try {
-                        await setDoc(doc(db, "users", currentUser.uid, "watched", movieId), { title: movieTitle, addedAt: new Date() });
+                        await setDoc(doc(db, "users", currentUser.uid, "watched", dbId), { title: title, type: type, addedAt: new Date() });
                         card.style.opacity = '';
                         card.classList.add('grayed-out');
                         button.innerText = "✅";
                     } catch (error) {
-                        console.error("Error:", error);
                         card.style.opacity = '';
                         button.innerText = "👁️";
                         button.disabled = false;
@@ -449,6 +514,7 @@
             });
         }
 
+        // --- MODAL DE PERFIL ---
         const modal = document.getElementById('profileModal');
         const modalBody = document.getElementById('modalBody');
 
@@ -458,10 +524,7 @@
         });
 
         document.getElementById('closeModalBtn').addEventListener('click', () => modal.classList.add('hidden'));
-        
-        modal.addEventListener('click', (e) => {
-            if(e.target === modal) modal.classList.add('hidden');
-        });
+        modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.add('hidden'); });
 
         document.getElementById('tabWatchlist').addEventListener('click', (e) => {
             document.getElementById('tabHistory').classList.remove('active');
@@ -489,11 +552,15 @@
                 let html = '';
                 querySnapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    const trailerLink = `https://www.youtube.com/results?search_query=trailer+español+latino+${encodeURIComponent(data.title)}`;
+                    const isTv = data.type === 'tv' || docSnap.id.startsWith('tv_');
+                    const icon = isTv ? '📺' : '🎬';
+                    const searchQuery = isTv ? `trailer español latino serie ${data.title}` : `trailer español latino pelicula ${data.title}`;
+                    const trailerLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`;
+                    
                     html += `
                         <div class="list-item" id="list-item-${docSnap.id}">
                             <div class="list-item-title">
-                                <a href="${trailerLink}" target="_blank" style="color: white; text-decoration: none;">▶ ${data.title}</a>
+                                <a href="${trailerLink}" target="_blank" style="color: white; text-decoration: none;">${icon} ${data.title}</a>
                             </div>
                             <button class="delete-btn" onclick="removeFromList('${collectionName}', '${docSnap.id}')">Eliminar</button>
                         </div>
@@ -501,13 +568,12 @@
                 });
                 modalBody.innerHTML = html;
             } catch(e) {
-                console.error(e);
                 modalBody.innerHTML = '<div class="empty-msg">Error al cargar la lista.</div>';
             }
         }
 
         window.removeFromList = async function(collectionName, docId) {
-            if(confirm('¿Seguro que querés eliminar esta película de tu lista?')) {
+            if(confirm('¿Seguro que querés eliminar esto de tu lista?')) {
                 const btn = document.querySelector(`#list-item-${docId} .delete-btn`);
                 btn.innerText = "Borrando...";
                 btn.disabled = true;
@@ -515,12 +581,8 @@
                 try {
                     await deleteDoc(doc(db, "users", currentUser.uid, collectionName, docId));
                     document.getElementById(`list-item-${docId}`).remove();
-                    
-                    if(document.querySelectorAll('.list-item').length === 0) {
-                        modalBody.innerHTML = `<div class="empty-msg">Tu lista está vacía.</div>`;
-                    }
+                    if(document.querySelectorAll('.list-item').length === 0) modalBody.innerHTML = `<div class="empty-msg">Tu lista está vacía.</div>`;
                 } catch(e) {
-                    console.error("Error al borrar:", e);
                     alert("Error al intentar eliminar.");
                     btn.innerText = "Eliminar";
                     btn.disabled = false;
